@@ -1,0 +1,24 @@
+/vendor/
+/composer.lock
+.phpunit.result.cache
+.coverage/
+coverage/
+
+# Rector
+/var/
+/.rector-cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/phpunit.xml
+/.phpunit.cache/
