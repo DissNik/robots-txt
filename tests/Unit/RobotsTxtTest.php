@@ -24,9 +24,10 @@ class RobotsTxtTest extends TestCase
             ->disallow('/admin')
             ->allow('/public');
 
-        $rules = $this->robots->getRules();
-        $this->assertArrayHasKey('Googlebot', $rules);
-        $this->assertContains('/admin', $rules['Googlebot']->getDisallowRules());
+        $content = $this->robots->generate();
+        $this->assertStringContainsString('User-agent: Googlebot', $content);
+        $this->assertStringContainsString('Disallow: /admin', $content);
+        $this->assertStringContainsString('Allow: /public', $content);
     }
 
     public function test_adds_sitemaps(): void
@@ -55,9 +56,10 @@ class RobotsTxtTest extends TestCase
                 ->crawlDelay(1.0);
         });
 
-        $rules = $this->robots->getRules();
-        $this->assertArrayHasKey('Googlebot', $rules);
-        $this->assertContains('/private', $rules['Googlebot']->getDisallowRules());
+        $content = $this->robots->generate();
+        $this->assertStringContainsString('User-agent: Googlebot', $content);
+        $this->assertStringContainsString('Disallow: /private', $content);
+        $this->assertStringContainsString('Crawl-delay: 1', $content);
     }
 
     public function test_conditional_rules_with_when(): void
@@ -68,9 +70,9 @@ class RobotsTxtTest extends TestCase
             $robots->forUserAgent('*')->disallow('/never');
         });
 
-        $rules = $this->robots->getRules();
-        $this->assertContains('/admin', $rules['*']->getDisallowRules());
-        $this->assertNotContains('/never', $rules['*']->getDisallowRules());
+        $content = $this->robots->generate();
+        $this->assertStringContainsString('Disallow: /admin', $content);
+        $this->assertStringNotContainsString('Disallow: /never', $content);
     }
 
     public function test_conditional_rules_with_unless(): void
@@ -81,22 +83,27 @@ class RobotsTxtTest extends TestCase
             $robots->forUserAgent('*')->disallow('/never');
         });
 
-        $rules = $this->robots->getRules();
-        $this->assertContains('/admin', $rules['*']->getDisallowRules());
-        $this->assertNotContains('/never', $rules['*']->getDisallowRules());
+        $content = $this->robots->generate();
+        $this->assertStringContainsString('Disallow: /admin', $content);
+        $this->assertStringNotContainsString('Disallow: /never', $content);
     }
 
     public function test_clears_all_rules(): void
     {
-        $this->robots->forUserAgent('*')->disallow('/admin');
+        $this->robots->forUserAgent('Googlebot')->disallow('/admin');
+        $this->robots->forUserAgent('Bingbot')->disallow('/private');
         $this->robots->sitemap('https://site.com/sitemap.xml');
 
-        $this->assertNotEmpty($this->robots->getRules());
+        $rulesBefore = $this->robots->getRules();
+        $this->assertNotEmpty($rulesBefore);
         $this->assertNotEmpty($this->robots->getSitemaps());
 
         $this->robots->clear();
 
-        $this->assertEmpty($this->robots->getRules());
+        $rulesAfter = $this->robots->getRules();
+        $this->assertCount(1, $rulesAfter);
+        $this->assertArrayHasKey('*', $rulesAfter);
+
         $this->assertEmpty($this->robots->getSitemaps());
     }
 

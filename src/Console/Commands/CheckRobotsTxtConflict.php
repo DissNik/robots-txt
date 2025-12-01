@@ -96,6 +96,7 @@ class CheckRobotsTxtConflict extends Command
             'rename' => $this->handleRename($path),
             'delete' => $this->handleDelete($path),
             'ignore' => $this->handleIgnore(),
+            default => self::FAILURE,
         };
     }
 
@@ -239,7 +240,7 @@ class CheckRobotsTxtConflict extends Command
         info($message);
 
         if ($backupPath) {
-            $this->components->twoColumnDetail('📁 Backup file', url(basename($backupPath)));
+            $this->components->twoColumnDetail('📁 Backup file', asset(basename($backupPath)));
         }
 
         if ($deletedFile) {

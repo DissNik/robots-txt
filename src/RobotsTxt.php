@@ -10,17 +10,21 @@ use Illuminate\Support\Facades\Cache;
 
 class RobotsTxt implements RobotsTxtInterface
 {
-    public array $directRules = []; // changed to public for simplicity
+    /** @var array<string, RobotsTxtRule> */
+    public array $directRules = [];
 
-    public array $directSitemaps = []; // changed to public
+    /** @var array<int, string> */
+    public array $directSitemaps = [];
 
+    /** @var array<string, array{environments: array<int, string>, callback: callable}> */
     protected array $environmentRules = [];
 
-    protected ?RobotsTxtRule $currentRule = null;
+    protected RobotsTxtRule $currentRule;
 
     public function __construct()
     {
         $this->setupDefaultRules();
+        $this->forUserAgent('*');
     }
 
     protected function setupDefaultRules(): void
@@ -96,7 +100,7 @@ class RobotsTxt implements RobotsTxtInterface
         return $this;
     }
 
-    public function forEnvironment($environments, callable $callback): self
+    public function forEnvironment(string|array $environments, callable $callback): self
     {
         $environments = (array) $environments;
         $key = implode('|', $environments);
@@ -128,7 +132,7 @@ class RobotsTxt implements RobotsTxtInterface
         $rules = $this->buildRules();
         $sitemaps = $this->buildSitemaps();
 
-        $content = $rules->map(fn ($rule) => $rule->generate())->implode("\n\n");
+        $content = $rules->map(fn ($rule): string => $rule->generate())->implode("\n\n");
 
         if ($sitemaps->isNotEmpty()) {
             $content .= "\n\n".$sitemaps->implode("\n");
@@ -137,68 +141,90 @@ class RobotsTxt implements RobotsTxtInterface
         return trim($content);
     }
 
+    /**
+     * @return Collection<int, RobotsTxtRule>
+     */
     protected function buildRules(): Collection
     {
+        /** @var Collection<int, RobotsTxtRule> $rules */
         $rules = Collection::make();
 
-        // 1. Применяем environment rules
         $this->applyEnvironmentRules($rules);
 
-        // 2. Добавляем direct rules
         $this->applyDirectRules($rules);
 
         return $rules;
     }
 
+    /**
+     * @param  Collection<int, RobotsTxtRule>  $rules
+     */
     protected function applyEnvironmentRules(Collection $rules): void
     {
         $currentEnv = App::environment();
 
+        // rector-ignore-next-line RemoveUnusedNonEmptyArrayBeforeForeachRector
+        if (empty($this->environmentRules)) {
+            return;
+        }
+
         foreach ($this->environmentRules as $rule) {
             if (in_array($currentEnv, $rule['environments'])) {
-                // Создаем временный экземпляр для environment rules
                 $tempRobots = new RobotsTxt;
-                $tempRobots->directRules = []; // Очищаем direct rules
+                $tempRobots->directRules = [];
 
-                // Выполняем callback на временном объекте
                 $rule['callback']($tempRobots);
 
-                // Переносим правила в основную коллекцию
-                foreach ($tempRobots->directRules as $userAgent => $tempRule) {
-                    if ($rules->has($userAgent)) {
-                        $rules->get($userAgent)->merge($tempRule);
-                    } else {
-                        $rules->put($userAgent, clone $tempRule);
+                // rector-ignore-next-line RemoveUnusedNonEmptyArrayBeforeForeachRector
+                if (! empty($tempRobots->directRules)) {
+                    foreach ($tempRobots->directRules as $tempRule) {
+                        $existingRule = $rules->first(fn (RobotsTxtRule $r): bool => $r->getUserAgent() === $tempRule->getUserAgent());
+
+                        if ($existingRule) {
+                            $existingRule->merge($tempRule);
+                        } else {
+                            $rules->push(clone $tempRule);
+                        }
                     }
                 }
             }
         }
     }
 
+    /**
+     * @param  Collection<int, RobotsTxtRule>  $rules
+     */
     protected function applyDirectRules(Collection $rules): void
     {
-        foreach ($this->directRules as $userAgent => $rule) {
-            if ($rules->has($userAgent)) {
-                $rules->get($userAgent)->merge($rule);
+        // rector-ignore-next-line RemoveUnusedNonEmptyArrayBeforeForeachRector
+        if (empty($this->directRules)) {
+            return;
+        }
+
+        foreach ($this->directRules as $rule) {
+            $existingRule = $rules->first(fn (RobotsTxtRule $r): bool => $r->getUserAgent() === $rule->getUserAgent());
+
+            if ($existingRule) {
+                $existingRule->merge($rule);
             } else {
-                $rules->put($userAgent, clone $rule);
+                $rules->push(clone $rule);
             }
         }
     }
 
+    /**
+     * @return Collection<int, string>
+     */
     protected function buildSitemaps(): Collection
     {
         return Collection::make($this->directSitemaps)
             ->unique()
+            ->values()
             ->map(fn ($url): string => "Sitemap: $url");
     }
 
     protected function getCurrentRule(): RobotsTxtRule
     {
-        if (! $this->currentRule instanceof RobotsTxtRule) {
-            $this->forUserAgent('*');
-        }
-
         return $this->currentRule;
     }
 
@@ -232,7 +258,7 @@ class RobotsTxt implements RobotsTxtInterface
         $this->directRules = [];
         $this->directSitemaps = [];
         $this->environmentRules = [];
-        $this->currentRule = null;
+        $this->forUserAgent('*');
 
         Cache::forget('robots_txt_content');
 
@@ -244,27 +270,91 @@ class RobotsTxt implements RobotsTxtInterface
         return Cache::forget('robots_txt_content');
     }
 
-    // Getters
+    /**
+     * @return array<string, array<int, array{allow: bool, path: string}>>
+     */
     public function getRules(): array
     {
-        return $this->directRules;
+        $result = [];
+
+        // rector-ignore-next-line SimplifyEmptyCheckOnEmptyArrayRector
+        if (empty($this->directRules)) {
+            return $result;
+        }
+
+        foreach ($this->directRules as $userAgent => $rule) {
+            $result[$userAgent] = $this->convertRuleToArray($rule);
+        }
+
+        return $result;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getSitemaps(): array
     {
         return $this->directSitemaps;
     }
 
+    /**
+     * @return array<string, array<string, array<int, array{allow: bool, path: string}>>>
+     */
     public function getEnvironmentRules(): array
     {
-        return $this->environmentRules;
+        $result = [];
+
+        // rector-ignore-next-line SimplifyEmptyCheckOnEmptyArrayRector
+        if (empty($this->environmentRules)) {
+            return $result;
+        }
+
+        foreach ($this->environmentRules as $key => $ruleData) {
+            $tempRobots = new RobotsTxt;
+            $tempRobots->directRules = [];
+            $ruleData['callback']($tempRobots);
+
+            $environmentRules = [];
+
+            // rector-ignore-next-line RemoveUnusedNonEmptyArrayBeforeForeachRector
+            if (! empty($tempRobots->directRules)) {
+                foreach ($tempRobots->directRules as $userAgent => $rule) {
+                    $environmentRules[$userAgent] = $this->convertRuleToArray($rule);
+                }
+            }
+
+            $result[$key] = $environmentRules;
+        }
+
+        return $result;
     }
 
+    /**
+     * @return array<int, array{allow: bool, path: string}>
+     */
+    private function convertRuleToArray(RobotsTxtRule $rule): array
+    {
+        return $rule->toArray();
+    }
+
+    /**
+     * @return array<string, bool>
+     */
     public function checkConflicts(): array
     {
-        return Collection::make($this->directRules)
-            ->map(fn ($rule) => $rule->hasConflicts())
-            ->filter()
-            ->all();
+        $conflicts = [];
+
+        // rector-ignore-next-line SimplifyEmptyCheckOnEmptyArrayRector
+        if (empty($this->directRules)) {
+            return $conflicts;
+        }
+
+        foreach ($this->directRules as $userAgent => $rule) {
+            if ($rule->hasConflicts()) {
+                $conflicts[$userAgent] = true;
+            }
+        }
+
+        return $conflicts;
     }
 }

@@ -6,8 +6,10 @@ use Illuminate\Support\Collection;
 
 class RobotsTxtRule
 {
+    /** @var array<int, string> */
     protected array $disallow = [];
 
+    /** @var array<int, string> */
     protected array $allow = [];
 
     protected ?float $crawlDelay = null;
@@ -43,7 +45,6 @@ class RobotsTxtRule
     {
         $lines = ["User-agent: {$this->userAgent}"];
 
-        // Разрешаем конфликты (Allow имеет приоритет)
         [$disallowRules, $allowRules] = $this->resolveConflicts();
 
         foreach ($disallowRules as $path) {
@@ -61,6 +62,9 @@ class RobotsTxtRule
         return implode("\n", $lines);
     }
 
+    /**
+     * @return array{array<int, string>, array<int, string>}
+     */
     protected function resolveConflicts(): array
     {
         $disallowRules = array_filter(
@@ -68,7 +72,7 @@ class RobotsTxtRule
             fn (string $disallow): bool => ! $this->hasAllowConflict($disallow)
         );
 
-        return [$disallowRules, array_unique($this->allow)];
+        return [array_values($disallowRules), array_unique($this->allow)];
     }
 
     protected function hasAllowConflict(string $disallowPath): bool
@@ -86,17 +90,22 @@ class RobotsTxtRule
             || str_starts_with($path2, $path1);
     }
 
-    // Getters
     public function getUserAgent(): string
     {
         return $this->userAgent;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getDisallowRules(): array
     {
         return $this->disallow;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getAllowRules(): array
     {
         return $this->allow;
@@ -124,6 +133,9 @@ class RobotsTxtRule
         return $this;
     }
 
+    /**
+     * @return array<int, array{disallow: string, allow: string}>
+     */
     public function hasConflicts(): array
     {
         $conflicts = [];
@@ -140,5 +152,31 @@ class RobotsTxtRule
         }
 
         return $conflicts;
+    }
+
+    /**
+     * @return array<int, array{allow: bool, path: string}>
+     */
+    public function toArray(): array
+    {
+        $result = [];
+
+        foreach ($this->disallow as $path) {
+            $result[] = ['allow' => false, 'path' => $path];
+        }
+
+        foreach ($this->allow as $path) {
+            $result[] = ['allow' => true, 'path' => $path];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<int, array{allow: bool, path: string}>
+     */
+    public function getRulesArray(): array
+    {
+        return $this->toArray();
     }
 }

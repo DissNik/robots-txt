@@ -5,6 +5,7 @@ namespace DissNik\RobotsTxt;
 use DissNik\RobotsTxt\Console\Commands\CheckRobotsTxtConflict;
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
 use DissNik\RobotsTxt\Http\Middleware\CacheRobotsTxt;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class RobotsTxtServiceProvider extends ServiceProvider
@@ -26,7 +27,7 @@ class RobotsTxtServiceProvider extends ServiceProvider
             __DIR__.'/../config/robots-txt.php' => config_path('robots-txt.php'),
         ], 'robots-txt-config');
 
-        $this->app['router']->aliasMiddleware('robots.txt.cache', CacheRobotsTxt::class);
+        Route::aliasMiddleware('robots.txt.cache', CacheRobotsTxt::class);
 
         $this->registerRoute();
 
@@ -40,11 +41,18 @@ class RobotsTxtServiceProvider extends ServiceProvider
     protected function registerRoute(): void
     {
         if (config('robots-txt.route.enabled', true)) {
-            $this->app['router']->get('robots.txt', fn () => response(app(RobotsTxtInterface::class)->generate(), 200, [
-                'Content-Type' => 'text/plain',
-            ]))
-                ->middleware(config('robots-txt.route.middleware', []))
-                ->name('robots-txt');
+            $route = Route::get('robots.txt', fn () => response(
+                $this->app->make(RobotsTxtInterface::class)->generate(),
+                200,
+                ['Content-Type' => 'text/plain']
+            ));
+
+            $middleware = config('robots-txt.route.middleware', []);
+            if (! empty($middleware)) {
+                $route->middleware($middleware);
+            }
+
+            $route->name('robots-txt');
         }
     }
 }

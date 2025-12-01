@@ -39,7 +39,8 @@
         "mockery/mockery": "^1.6",
         "laravel/pint": "^1.26",
         "rector/rector": "^2.2",
-        "laravel/prompts": "^0.1.25"
+        "laravel/prompts": "^0.1.25",
+        "phpstan/phpstan": "^2.1"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
