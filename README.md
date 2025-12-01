@@ -53,6 +53,20 @@ return [
 ];
 ```
 
+## Conflict Check
+
+> [!WARNING]
+> **File takes priority!** If a `public/robots.txt` file exists on your server,
+> it will **OVERRIDE** the package's generated content.
+
+```bash
+php artisan robots-txt:check
+```
+
+This command will:
+- Detect if a robots.txt file exists
+- Help you choose the best resolution method
+
 ## Quick Start
 
 ### Basic Usage

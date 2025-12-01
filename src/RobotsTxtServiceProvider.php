@@ -2,6 +2,7 @@
 
 namespace DissNik\RobotsTxt;
 
+use DissNik\RobotsTxt\Console\Commands\CheckRobotsTxtConflict;
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
 use DissNik\RobotsTxt\Http\Middleware\CacheRobotsTxt;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,12 @@ class RobotsTxtServiceProvider extends ServiceProvider
         $this->app['router']->aliasMiddleware('robots.txt.cache', CacheRobotsTxt::class);
 
         $this->registerRoute();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CheckRobotsTxtConflict::class,
+            ]);
+        }
     }
 
     protected function registerRoute(): void
@@ -35,7 +42,9 @@ class RobotsTxtServiceProvider extends ServiceProvider
         if (config('robots-txt.route.enabled', true)) {
             $this->app['router']->get('robots.txt', fn () => response(app(RobotsTxtInterface::class)->generate(), 200, [
                 'Content-Type' => 'text/plain',
-            ]))->middleware(config('robots-txt.route.middleware', []));
+            ]))
+                ->middleware(config('robots-txt.route.middleware', []))
+                ->name('robots-txt');
         }
     }
 }
