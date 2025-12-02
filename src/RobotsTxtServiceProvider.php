@@ -12,8 +12,7 @@ class RobotsTxtServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(RobotsTxtInterface::class, fn (): RobotsTxt => new RobotsTxt);
-
+        $this->app->singleton(RobotsTxtInterface::class, RobotsTxtBuilder::class);
         $this->app->alias(RobotsTxtInterface::class, 'robots-txt');
 
         $this->mergeConfigFrom(
@@ -32,20 +31,18 @@ class RobotsTxtServiceProvider extends ServiceProvider
         $this->registerRoute();
 
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                CheckRobotsTxtConflict::class,
-            ]);
+            $this->commands([CheckRobotsTxtConflict::class]);
         }
     }
 
     protected function registerRoute(): void
     {
         if (config('robots-txt.route.enabled', true)) {
-            $route = Route::get('robots.txt', fn () => response(
-                $this->app->make(RobotsTxtInterface::class)->generate(),
-                200,
-                ['Content-Type' => 'text/plain']
-            ));
+            $route = Route::get('robots.txt', function () {
+                $content = app(RobotsTxtInterface::class)->generate();
+
+                return response($content, 200, ['Content-Type' => 'text/plain']);
+            });
 
             $middleware = config('robots-txt.route.middleware', []);
             if (! empty($middleware)) {

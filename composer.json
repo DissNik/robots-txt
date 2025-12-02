@@ -28,10 +28,10 @@
         }
     },
     "require": {
-        "php": "^8.1|^8.2|^8.3",
-        "illuminate/support": "^9.0|^10.0|^11.0",
-        "illuminate/http": "^9.0|^10.0|^11.0",
-        "illuminate/cache": "^9.0|^10.0|^11.0"
+        "php": "^8.1|^8.2|^8.3|^8.4",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0",
+        "illuminate/cache": "^10.0|^11.0|^12.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",
@@ -45,6 +45,8 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "test-config": "vendor/bin/phpunit --filter=ConfigIntegrationTest",
+        "test-rule": "vendor/bin/phpunit --filter=RobotsTxtRuleTest",
         "analyse": "vendor/bin/phpstan analyse",
         "lint": "vendor/bin/pint --test",
         "lint-fix": "vendor/bin/pint -v",

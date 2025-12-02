@@ -5,6 +5,7 @@ namespace DissNik\RobotsTxt\Tests\Feature;
 use DissNik\RobotsTxt\Facades\RobotsTxt;
 use DissNik\RobotsTxt\Tests\TestCase;
 use Illuminate\Support\Facades\App;
+use PHPUnit\Framework\Attributes\Test;
 
 class EnvironmentRulesTest extends TestCase
 {
@@ -14,16 +15,21 @@ class EnvironmentRulesTest extends TestCase
         RobotsTxt::clear();
     }
 
-    public function test_applies_rules_for_specific_environment(): void
+    #[Test]
+    public function applies_rules_for_specific_environment(): void
     {
         App::partialMock()
             ->shouldReceive('environment')
             ->andReturn('production');
 
         RobotsTxt::forEnvironment('production', function ($robots): void {
-            $robots->forUserAgent('*')->allow('/');
+            $robots->forUserAgent('*', function ($context) {
+                $context->allow('/');
+            });
         })->forEnvironment('local', function ($robots): void {
-            $robots->forUserAgent('*')->disallow('/');
+            $robots->forUserAgent('*', function ($context) {
+                $context->disallow('/');
+            });
         });
 
         $content = RobotsTxt::generate();
@@ -32,14 +38,17 @@ class EnvironmentRulesTest extends TestCase
         $this->assertStringNotContainsString('Disallow: /', $content);
     }
 
-    public function test_applies_rules_for_multiple_environments(): void
+    #[Test]
+    public function applies_rules_for_multiple_environments(): void
     {
         App::partialMock()
             ->shouldReceive('environment')
             ->andReturn('staging');
 
         RobotsTxt::forEnvironment(['staging', 'production'], function ($robots): void {
-            $robots->forUserAgent('*')->disallow('/admin');
+            $robots->forUserAgent('*', function ($context) {
+                $context->disallow('/admin');
+            });
         });
 
         $content = RobotsTxt::generate();
@@ -47,14 +56,17 @@ class EnvironmentRulesTest extends TestCase
         $this->assertStringContainsString('Disallow: /admin', $content);
     }
 
-    public function test_does_not_apply_rules_for_other_environments(): void
+    #[Test]
+    public function does_not_apply_rules_for_other_environments(): void
     {
         App::partialMock()
             ->shouldReceive('environment')
             ->andReturn('production');
 
-        RobotsTxt::forEnvironment('local', function ($robots): void {
-            $robots->forUserAgent('*')->disallow('/');
+        RobotsTxt::forEnvironment('local', function ($env): void {
+            $env->forUserAgent('*', function ($context) {
+                $context->disallow('/');
+            });
         });
 
         $content = RobotsTxt::generate();

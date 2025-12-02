@@ -6,23 +6,30 @@ use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static RobotsTxtInterface forUserAgent(string $userAgent)
- * @method static RobotsTxtInterface disallow(string $path)
- * @method static RobotsTxtInterface allow(string $path)
- * @method static RobotsTxtInterface crawlDelay(float $delay)
+ * @method static RobotsTxtInterface forEnvironment(string|array $environments, callable $callback)
+ * @method static RobotsTxtInterface forUserAgent(string $userAgent, callable $callback)
+ * @method static RobotsTxtInterface directive(string $directive, $value)
  * @method static RobotsTxtInterface sitemap(string $url)
- * @method static RobotsTxtInterface group(string $userAgent, callable $callback)
- * @method static RobotsTxtInterface when(bool $condition, callable $callback)
- * @method static RobotsTxtInterface unless(bool $condition, callable $callback)
- * @method static RobotsTxtInterface forEnvironment(string|array<int, string> $environments, callable $callback)
- * @method static string generate()
+ * @method static RobotsTxtInterface host(string $host)
+ * @method static RobotsTxtInterface cleanParam(string $param, ?string $path = null)
+ * @method static RobotsTxtInterface blockAll()
+ * @method static RobotsTxtInterface allowAll()
  * @method static RobotsTxtInterface clear()
+ * @method static RobotsTxtInterface reset()
+ * @method static string generate()
  * @method static bool clearCache()
- * @method static array<string, array<int, array{allow: bool, path: string}>> getRules()
- * @method static array<int, string> getSitemaps()
- * @method static array<string, array<string, array<int, array{allow: bool, path: string}>>> getEnvironmentRules()
+ * @method static array getRules()
+ * @method static array getSitemaps()
+ * @method static array getDirectives()
+ * @method static array getUserAgentDirectives(string $userAgent)
+ * @method static array getEnvironmentRules()
+ * @method static RobotsTxtInterface removeDirective(string $directive, $value = null)
+ * @method static RobotsTxtInterface removeUserAgentDirective(string $userAgent, string $directive, $value = null)
+ * @method static array checkConflicts()
+ * @method static array getUserAgents()
+ * @method static bool hasUserAgent(string $userAgent)
  *
- * @see \DissNik\RobotsTxt\RobotsTxt
+ * @see \DissNik\RobotsTxt\RobotsTxtBuilder
  */
 class RobotsTxt extends Facade
 {
