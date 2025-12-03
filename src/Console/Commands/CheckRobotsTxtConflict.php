@@ -3,6 +3,7 @@
 namespace DissNik\RobotsTxt\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Throwable;
 
 use function Laravel\Prompts\confirm;
@@ -15,7 +16,8 @@ class CheckRobotsTxtConflict extends Command
 {
     protected $signature = 'robots-txt:check
                             {--rename : Automatically rename the file}
-                            {--delete : Automatically delete the file}';
+                            {--delete : Automatically delete the file}
+                            {--force : Skip confirmation prompts}';
 
     protected $description = 'Check for robots.txt conflicts and provide solutions';
 
@@ -24,6 +26,9 @@ class CheckRobotsTxtConflict extends Command
         $filePath = public_path('robots.txt');
 
         if (! $this->fileExists($filePath)) {
+            info('✅ No robots.txt file found in public directory.');
+            info('✅ Package will work correctly.');
+
             return self::SUCCESS;
         }
 
@@ -38,23 +43,19 @@ class CheckRobotsTxtConflict extends Command
 
     protected function fileExists(string $path): bool
     {
-        if (! file_exists($path)) {
-            info('Package will work correctly.');
-
-            return false;
-        }
-
-        return true;
+        return file_exists($path) && is_file($path);
     }
 
     protected function displayConflictWarning(string $path): void
     {
-        error('ROBOTS.TXT CONFLICT DETECTED');
+        error('⚠️  ROBOTS.TXT CONFLICT DETECTED');
 
-        $this->components->twoColumnDetail('<fg=yellow>⚠️ File</>', $path);
-        $this->components->twoColumnDetail('❌ Package route', route('robots-txt', absolute: false));
+        $this->components->twoColumnDetail('File location', $path);
+        $this->components->twoColumnDetail('File size', $this->formatBytes(filesize($path)));
+        $this->components->twoColumnDetail('File modified', date('Y-m-d H:i:s', filemtime($path)));
+        $this->components->twoColumnDetail('Package route', route('robots-txt', absolute: false));
 
-        warning('This file will override package rules!');
+        warning("\nThis file will override package rules! The package robots.txt will not be accessible.");
     }
 
     protected function processAutoOptions(string $path): bool
@@ -66,7 +67,7 @@ class CheckRobotsTxtConflict extends Command
         }
 
         if ($this->option('delete')) {
-            if (! $this->confirmDeletion()) {
+            if (! $this->option('force') && ! $this->confirmDeletion()) {
                 info('Operation cancelled.');
 
                 return true;
@@ -85,9 +86,10 @@ class CheckRobotsTxtConflict extends Command
         $choice = select(
             label: 'How would you like to resolve this conflict?',
             options: [
-                'rename' => 'Create backup and remove file',
-                'delete' => 'Delete the file',
-                'ignore' => 'Do nothing (⚠ package rules will not work!)',
+                'rename' => 'Create backup and remove file (recommended)',
+                'delete' => 'Delete the file permanently',
+                'view' => 'View file contents',
+                'ignore' => 'Do nothing (package rules will not work!)',
             ],
             default: 'rename'
         );
@@ -95,6 +97,7 @@ class CheckRobotsTxtConflict extends Command
         return match ($choice) {
             'rename' => $this->handleRename($path),
             'delete' => $this->handleDelete($path),
+            'view' => $this->handleView($path),
             'ignore' => $this->handleIgnore(),
             default => self::FAILURE,
         };
@@ -107,17 +110,17 @@ class CheckRobotsTxtConflict extends Command
 
     protected function handleDelete(string $path): int
     {
-        if (! $this->confirmDeletion()) {
+        if (! $this->option('force') && ! $this->confirmDeletion()) {
             error('Operation cancelled.');
 
             return self::SUCCESS;
         }
 
         $backupPath = null;
-        if ($this->confirmBackupCreation()) {
+        if (! $this->option('force') && $this->confirmBackupCreation()) {
             $backupPath = $this->generateBackupPath($path);
             if (! $this->createBackup($path, $backupPath)) {
-                if (! confirm('Continue without backup?', default: false)) {
+                if (! $this->option('force') && ! confirm('Continue without backup?', default: false)) {
                     return self::SUCCESS;
                 }
                 $backupPath = null;
@@ -133,10 +136,27 @@ class CheckRobotsTxtConflict extends Command
         return self::SUCCESS;
     }
 
+    protected function handleView(string $path): int
+    {
+        try {
+            $content = File::get($path);
+            $this->line("\n=== File contents of {$path} ===");
+            $this->line($content);
+            $this->line("=== End of file ===\n");
+
+            return $this->handleInteractiveResolution($path);
+        } catch (Throwable $e) {
+            error('Error reading file: '.$e->getMessage());
+
+            return self::FAILURE;
+        }
+    }
+
     protected function handleIgnore(): int
     {
-        error('Conflict ignored');
-        warning("Package rules will not work while file exists.\nRun this command again when ready to resolve.");
+        warning('⚠️  Conflict ignored');
+        warning('Package rules will not work while file exists.');
+        warning('Run `php artisan robots-txt:check` again when ready to resolve.');
 
         return self::SUCCESS;
     }
@@ -176,15 +196,18 @@ class CheckRobotsTxtConflict extends Command
     protected function generateBackupPath(string $originalPath): string
     {
         $timestamp = date('Y-m-d_His');
+        $baseName = basename($originalPath);
+        $dirName = dirname($originalPath);
         $counter = 1;
 
         do {
-            $backupPath = sprintf(
+            $backupName = sprintf(
                 '%s.backup_%s%s',
-                $originalPath,
+                $baseName,
                 $timestamp,
                 $counter > 1 ? "_{$counter}" : ''
             );
+            $backupPath = $dirName.'/'.$backupName;
             $counter++;
         } while (file_exists($backupPath));
 
@@ -194,8 +217,8 @@ class CheckRobotsTxtConflict extends Command
     protected function createBackup(string $source, string $destination): bool
     {
         try {
-            if (! copy($source, $destination)) {
-                error('Failed to create backup file');
+            if (! File::copy($source, $destination)) {
+                error('Failed to create backup file. Check directory permissions.');
 
                 return false;
             }
@@ -211,8 +234,8 @@ class CheckRobotsTxtConflict extends Command
     protected function removeFile(string $path): bool
     {
         try {
-            if (! unlink($path)) {
-                error('Failed to remove file');
+            if (! File::delete($path)) {
+                error('Failed to remove file. Check file permissions.');
 
                 return false;
             }
@@ -237,16 +260,28 @@ class CheckRobotsTxtConflict extends Command
 
     protected function displaySuccess(string $message, ?string $backupPath = null, ?string $deletedFile = null): void
     {
-        info($message);
+        info('✅ '.$message);
 
         if ($backupPath) {
-            $this->components->twoColumnDetail('📁 Backup file', asset(basename($backupPath)));
+            $this->components->twoColumnDetail('📁 Backup created', $backupPath);
         }
 
         if ($deletedFile) {
-            $this->components->twoColumnDetail('🗑️ File deleted', $deletedFile);
+            $this->components->twoColumnDetail('🗑️ Original file', $deletedFile);
         }
 
-        $this->components->twoColumnDetail('✅ Package route', route('robots-txt'));
+        $this->components->twoColumnDetail('✅ Package route', route('robots-txt', absolute: false));
+        info("\nThe package robots.txt is now accessible at: ".url('robots.txt'));
+    }
+
+    protected function formatBytes(int $bytes, int $precision = 2): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

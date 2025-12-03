@@ -4,45 +4,31 @@ namespace DissNik\RobotsTxt\Contracts;
 
 interface RobotsTxtInterface
 {
-    public function forUserAgent(string $userAgent): self;
-
-    public function disallow(string $path): self;
-
-    public function allow(string $path): self;
-
-    public function crawlDelay(float $delay): self;
-
-    public function sitemap(string $url): self;
-
-    public function group(string $userAgent, callable $callback): self;
-
-    public function when(bool $condition, callable $callback): self;
-
-    public function unless(bool $condition, callable $callback): self;
-
-    /**
-     * @param  string|array<int, string>  $environments
-     */
-    public function forEnvironment(string|array $environments, callable $callback): self;
-
     public function generate(): string;
-
     public function clear(): self;
-
+    public function reset(): self;
     public function clearCache(): bool;
 
-    /**
-     * @return array<string, array<int, array{allow: bool, path: string}>>
-     */
+    public function sitemap(string $url): self;
+    public function host(string $host): self;
+    public function cleanParam(string $param, ?string $path = null): self;
+    public function directive(string $directive, $value): self;
+
+    public function forUserAgent(string $userAgent, callable $callback): self;
+
+    public function forEnvironment(string|array $environments, callable $callback): self;
+
+    public function blockAll(): self;
+    public function allowAll(): self;
+    public function removeDirective(string $directive, $value = null): self;
+    public function removeUserAgentDirective(string $userAgent, string $directive, $value = null): self;
+
     public function getRules(): array;
-
-    /**
-     * @return array<int, string>
-     */
     public function getSitemaps(): array;
-
-    /**
-     * @return array<string, array<string, array<int, array{allow: bool, path: string}>>>
-     */
+    public function getDirectives(): array;
+    public function getUserAgentDirectives(string $userAgent): array;
     public function getEnvironmentRules(): array;
+    public function checkConflicts(): array;
+    public function getUserAgents(): array;
+    public function hasUserAgent(string $userAgent): bool;
 }
