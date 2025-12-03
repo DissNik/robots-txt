@@ -12,7 +12,7 @@ class FacadeTest extends TestCase
     public function facade_proxies_methods(): void
     {
         RobotsTxt::clear();
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/admin');
         });
 

@@ -89,7 +89,7 @@ class DirectiveManager
         $path = preg_replace('#/+#', '/', $path);
 
         if (! empty($path) && $path !== '*' && ! str_starts_with($path, '/')) {
-            $path = '/'.$path;
+            return '/'.$path;
         }
 
         return $path;
@@ -107,12 +107,8 @@ class DirectiveManager
         $path1WithSlash = rtrim($path1, '/').'/';
         $path2WithSlash = rtrim($path2, '/').'/';
 
-        if (str_starts_with($path1WithSlash, $path2WithSlash) ||
-            str_starts_with($path2WithSlash, $path1WithSlash)) {
-            return true;
-        }
-
-        return false;
+        return str_starts_with($path1WithSlash, $path2WithSlash) ||
+            str_starts_with($path2WithSlash, $path1WithSlash);
     }
 
     public function addGlobalDirective(string $directive, $value, array &$globalDirectives): void
@@ -154,7 +150,7 @@ class DirectiveManager
         } else {
             $globalDirectives[$directive] = array_filter(
                 $globalDirectives[$directive],
-                fn ($item) => $item !== $value
+                fn ($item): bool => $item !== $value
             );
 
             if (empty($globalDirectives[$directive])) {

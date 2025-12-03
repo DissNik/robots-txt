@@ -55,7 +55,7 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function adds_user_agent_directives(): void
     {
-        $this->manager->forUserAgent('*', function ($context) {
+        $this->manager->forUserAgent('*', function ($context): void {
             $context->directive('disallow', '/admin');
         });
         $directives = $this->manager->getUserAgentDirectives('*');
@@ -66,7 +66,7 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function convenience_methods_work(): void
     {
-        $this->manager->forUserAgent('*', function ($context) {
+        $this->manager->forUserAgent('*', function ($context): void {
             $context->allow('/')
                 ->disallow('/admin')
                 ->crawlDelay(1.5);
@@ -86,14 +86,14 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function conditional_methods_work(): void
     {
-        $this->manager->when(true, function ($robots) {
-            $robots->forUserAgent('*', function ($context) {
+        $this->manager->when(true, function ($robots): void {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->disallow('/test');
             });
         });
 
-        $this->manager->when(false, function ($robots) {
-            $robots->forUserAgent('*', function ($context) {
+        $this->manager->when(false, function ($robots): void {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->disallow('/never');
             });
         });
@@ -110,8 +110,8 @@ class RobotsTxtBuilderTest extends TestCase
             ->shouldReceive('environment')
             ->andReturn('testing');
 
-        $this->manager->forEnvironment('testing', function ($robots) {
-            $robots->forUserAgent('*', function ($context) {
+        $this->manager->forEnvironment('testing', function ($robots): void {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->disallow('/test');
             });
         });
@@ -123,7 +123,7 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function clear_method_works(): void
     {
-        $this->manager->forUserAgent('Googlebot', function ($context) {
+        $this->manager->forUserAgent('Googlebot', function ($context): void {
             $context->disallow('/admin');
         });
         $this->assertNotEmpty($this->manager->getRules());
@@ -171,7 +171,7 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function check_conflicts(): void
     {
-        $this->manager->forUserAgent('*', function ($context) {
+        $this->manager->forUserAgent('*', function ($context): void {
             $context->disallow('/admin')
                 ->allow('/admin');
         });
@@ -183,8 +183,8 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function gets_user_agents(): void
     {
-        $this->manager->forUserAgent('Googlebot', function ($context) {});
-        $this->manager->forUserAgent('Bingbot', function ($context) {});
+        $this->manager->forUserAgent('Googlebot', function ($context): void {});
+        $this->manager->forUserAgent('Bingbot', function ($context): void {});
 
         $agents = $this->manager->getUserAgents();
         $this->assertContains('Googlebot', $agents);
@@ -194,7 +194,7 @@ class RobotsTxtBuilderTest extends TestCase
     #[Test]
     public function checks_user_agent_existence(): void
     {
-        $this->manager->forUserAgent('Googlebot', function ($context) {});
+        $this->manager->forUserAgent('Googlebot', function ($context): void {});
 
         $this->assertTrue($this->manager->hasUserAgent('Googlebot'));
         $this->assertFalse($this->manager->hasUserAgent('Bingbot'));

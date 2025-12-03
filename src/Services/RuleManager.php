@@ -9,11 +9,8 @@ class RuleManager
     /** @var array<string, RobotsTxtRule> */
     private array $userAgentRules = [];
 
-    private DirectiveManager $directiveManager;
-
-    public function __construct(DirectiveManager $directiveManager)
+    public function __construct(private readonly DirectiveManager $directiveManager)
     {
-        $this->directiveManager = $directiveManager;
         $this->ensureRuleExists('*');
     }
 

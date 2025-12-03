@@ -4,12 +4,7 @@ namespace DissNik\RobotsTxt\Services;
 
 class ContentGenerator
 {
-    private DirectiveManager $directiveManager;
-
-    public function __construct(DirectiveManager $directiveManager)
-    {
-        $this->directiveManager = $directiveManager;
-    }
+    public function __construct(private readonly DirectiveManager $directiveManager) {}
 
     public function generate(array $userAgentRules, array $globalDirectives): string
     {
@@ -27,12 +22,12 @@ class ContentGenerator
         foreach ($sortedGlobalDirectives as $directive => $values) {
             if ($this->directiveManager->isGlobalSingleDirective($directive)) {
                 if (! empty($values)) {
-                    $lines[] = ucfirst($directive).': '.$values;
+                    $lines[] = ucfirst((string) $directive).': '.$values;
                 }
             } else {
                 foreach ($values as $value) {
                     if (! empty($value)) {
-                        $lines[] = ucfirst($directive).': '.$value;
+                        $lines[] = ucfirst((string) $directive).': '.$value;
                     }
                 }
             }

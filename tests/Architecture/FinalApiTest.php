@@ -2,9 +2,9 @@
 
 namespace DissNik\RobotsTxt\Tests\Architecture;
 
+use BadMethodCallException;
 use DissNik\RobotsTxt\RobotsTxtBuilder;
 use DissNik\RobotsTxt\Tests\TestCase;
-use BadMethodCallException;
 use PHPUnit\Framework\Attributes\Test;
 
 class FinalApiTest extends TestCase
@@ -20,37 +20,37 @@ class FinalApiTest extends TestCase
             ->cleanParam('ref', '/search/')
             ->directive('X-Robots-Tag', 'noindex');
 
-        $builder->forUserAgent('*', function($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/admin')
                 ->crawlDelay(1.0)
-                ->when(app()->environment('production'), function($ctx) {
+                ->when(app()->environment('production'), function ($ctx): void {
                     $ctx->allow('/api');
                 });
         });
 
-        $builder->forUserAgent('Googlebot', function($ctx) {
+        $builder->forUserAgent('Googlebot', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/private')
                 ->crawlDelay(0.5);
         });
 
-        $builder->forUserAgent('Yandex', function($ctx) {
+        $builder->forUserAgent('Yandex', function ($ctx): void {
             $ctx->directive('host', 'yandex.example.com')
-            ->allow('/')
+                ->allow('/')
                 ->cleanParam('ref', '/search/')
                 ->directive('visit-time', '0900-1800');
         });
 
-        $builder->forEnvironment('production', function($env) {
+        $builder->forEnvironment('production', function ($env): void {
             $env->sitemap('https://prod.example.com/sitemap.xml')
-                ->forUserAgent('*', function($ctx) {
+                ->forUserAgent('*', function ($ctx): void {
                     $ctx->allow('/api');
                 });
         });
 
-        $builder->forEnvironment(['local', 'staging'], function($env) {
-            $env->forUserAgent('*', function($ctx) {
+        $builder->forEnvironment(['local', 'staging'], function ($env): void {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->blockAll();
             });
         });
@@ -81,16 +81,16 @@ class FinalApiTest extends TestCase
         $builder->crawlDelay(1.0);
 
         $builder->clear();
-        $builder->forUserAgent('*', function($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/');
         });
 
         $builder->clear();
-        $builder->forEnvironment('prod', function($env) {
+        $builder->forEnvironment('prod', function ($env): void {
             $this->expectException(BadMethodCallException::class);
             $env->allow('/');
 
-            $env->forUserAgent('*', function($ctx) {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/');
             });
         });
@@ -102,16 +102,16 @@ class FinalApiTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->when(true, function($robots) {
+        $builder->when(true, function ($robots): void {
             $robots->sitemap('active.xml');
-        })->unless(false, function($robots) {
+        })->unless(false, function ($robots): void {
             $robots->host('active.com');
         });
 
-        $builder->forUserAgent('*', function($ctx) {
-            $ctx->when(app()->environment('production'), function($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
+            $ctx->when(app()->environment('production'), function ($ctx): void {
                 $ctx->allow('/api');
-            })->unless(app()->environment('local'), function($ctx) {
+            })->unless(app()->environment('local'), function ($ctx): void {
                 $ctx->disallow('/debug');
             });
         });

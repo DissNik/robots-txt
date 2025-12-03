@@ -11,18 +11,11 @@ class EnvironmentContext
 {
     use Conditionable;
 
-    private RobotsTxtInterface $robotsManager;
-
-    private EnvironmentRuleApplier $environmentApplier;
-
     private array $environments;
 
-    public function __construct(
-        RobotsTxtInterface $robotsManager,
-        EnvironmentRuleApplier $environmentApplier
-    ) {
-        $this->robotsManager = $robotsManager;
-        $this->environmentApplier = $environmentApplier;
+    public function __construct(private RobotsTxtInterface $robotsManager, private EnvironmentRuleApplier $environmentApplier)
+    {
+        //
     }
 
     public function forUserAgent(string $userAgent, callable $callback): self
@@ -78,7 +71,7 @@ class EnvironmentContext
     {
         $this->environmentApplier->addCallback(
             $this->environments,
-            function (RobotsTxtInterface $robots) {
+            function (RobotsTxtInterface $robots): void {
                 // All methods have already been called during configuration
                 // This callback ensures the environment is registered
             }
@@ -110,7 +103,7 @@ class EnvironmentContext
         }
 
         throw new BadMethodCallException(
-            "Method {$method} does not exist on ".get_class($this)
+            "Method {$method} does not exist on ".static::class
         );
     }
 }

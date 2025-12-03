@@ -89,7 +89,7 @@ class ConfigIntegrationTest extends TestCase
             ->andReturn('production');
 
         $robots = app()->make(RobotsTxtInterface::class);
-        $robots->forUserAgent('*', function ($context) {
+        $robots->forUserAgent('*', function ($context): void {
             $context->disallow('/api');
         });
 
@@ -126,7 +126,7 @@ class ConfigIntegrationTest extends TestCase
         $this->assertStringContainsString('Sitemap: https://example.com/sitemap.xml', $content);
         $this->assertStringContainsString('Sitemap: https://example.com/sitemap-images.xml', $content);
 
-        $sitemapCount = substr_count($content, 'Sitemap:');
+        $sitemapCount = substr_count((string) $content, 'Sitemap:');
         $this->assertEquals(2, $sitemapCount);
     }
 
@@ -187,7 +187,7 @@ class ConfigIntegrationTest extends TestCase
 
         $robots = app()->make(RobotsTxtInterface::class);
 
-        $robots->forUserAgent('*', function ($context) {
+        $robots->forUserAgent('*', function ($context): void {
             $context->disallow('/programmatic');
         });
 
@@ -195,7 +195,7 @@ class ConfigIntegrationTest extends TestCase
 
         $content = $robots->generate();
 
-        $this->assertEquals('', trim($content));
+        $this->assertEquals('', trim((string) $content));
         $this->assertStringNotContainsString('Disallow: /from-config', $content);
         $this->assertStringNotContainsString('Disallow: /programmatic', $content);
     }
@@ -219,7 +219,7 @@ class ConfigIntegrationTest extends TestCase
 
         $robots = app()->make(RobotsTxtInterface::class);
 
-        $robots->forUserAgent('*', function ($context) {
+        $robots->forUserAgent('*', function ($context): void {
             $context->disallow('/programmatic');
         });
 
@@ -255,7 +255,7 @@ class ConfigIntegrationTest extends TestCase
 
         $robots->clear();
         $content = $robots->generate();
-        $this->assertEquals('', trim($content));
+        $this->assertEquals('', trim((string) $content));
 
         $robots->reset();
         $content = $robots->generate();
