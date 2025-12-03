@@ -17,7 +17,7 @@ class NewArchitectureTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $this->assertInstanceOf(UserAgentContext::class, $ctx);
 
             $this->assertTrue(method_exists($ctx, 'allow'));
@@ -41,7 +41,7 @@ class NewArchitectureTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forEnvironment('production', function ($env) {
+        $builder->forEnvironment('production', function ($env): void {
             $this->assertInstanceOf(EnvironmentContext::class, $env);
 
             $this->assertTrue(method_exists($env, 'userAgent'));
@@ -97,7 +97,7 @@ class NewArchitectureTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/admin')
                 ->crawlDelay(1.0);
@@ -119,10 +119,10 @@ class NewArchitectureTest extends TestCase
 
         app()->instance('env', 'production');
 
-        $builder->forEnvironment('production', function ($env) {
+        $builder->forEnvironment('production', function ($env): void {
             $env->sitemap('prod-sitemap.xml')
                 ->host('prod.example.com')
-                ->forUserAgent('*', function ($ctx) {
+                ->forUserAgent('*', function ($ctx): void {
                     $ctx->allow('/');
                 });
         });
@@ -140,13 +140,13 @@ class NewArchitectureTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->when(true, function ($robots) {
+        $builder->when(true, function ($robots): void {
             $robots->sitemap('sitemap.xml');
-        })->when(false, function ($robots) {
+        })->when(false, function ($robots): void {
             $robots->sitemap('never.xml');
-        })->unless(true, function ($robots) {
+        })->unless(true, function ($robots): void {
             $robots->host('never.com');
-        })->unless(false, function ($robots) {
+        })->unless(false, function ($robots): void {
             $robots->host('example.com');
         });
 
@@ -164,8 +164,8 @@ class NewArchitectureTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forEnvironment('dev', function ($env) {
-            $env->forUserAgent('*', function ($ctx) {
+        $builder->forEnvironment('dev', function ($env): void {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/admin/login')
                     ->disallow('/admin')
                     ->allow('/api/v1/users')
@@ -173,7 +173,7 @@ class NewArchitectureTest extends TestCase
                     ->crawlDelay(0.7);
             });
 
-            $env->forUserAgent('Google', function ($ctx) {
+            $env->forUserAgent('Google', function ($ctx): void {
                 $ctx->allow('/admin/login')
                     ->disallow('/admin2')
                     ->allow('/api/v1/users')
@@ -182,7 +182,7 @@ class NewArchitectureTest extends TestCase
                     ->directive('Sitemap', 'https://site.com/sitemap.xml'); // Через directive()
             });
 
-            $env->forUserAgent('Yandex', function ($ctx) {
+            $env->forUserAgent('Yandex', function ($ctx): void {
                 $ctx->allow('/admin/login')
                     ->disallow('/admin2')
                     ->allow('/api/v1/users')

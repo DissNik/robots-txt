@@ -120,7 +120,7 @@ class CheckRobotsTxtConflict extends Command
         if (! $this->option('force') && $this->confirmBackupCreation()) {
             $backupPath = $this->generateBackupPath($path);
             if (! $this->createBackup($path, $backupPath)) {
-                if (! $this->option('force') && ! confirm('Continue without backup?', default: false)) {
+                if (! confirm('Continue without backup?', default: false)) {
                     return self::SUCCESS;
                 }
                 $backupPath = null;
@@ -280,7 +280,7 @@ class CheckRobotsTxtConflict extends Command
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
+        $bytes /= 1024 ** $pow;
 
         return round($bytes, $precision).' '.$units[$pow];
     }

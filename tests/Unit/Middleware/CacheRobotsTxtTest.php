@@ -19,9 +19,7 @@ class CacheRobotsTxtTest extends TestCase
         $middleware = new CacheRobotsTxt;
         $request = Request::create('http://example.com/robots.txt');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('content', 200);
-        });
+        $response = $middleware->handle($request, fn ($req): Response => new Response('content', 200));
 
         $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
         $this->assertEquals(3600, $response->getMaxAge());
@@ -33,9 +31,7 @@ class CacheRobotsTxtTest extends TestCase
         $middleware = new CacheRobotsTxt;
         $request = Request::create('http://example.com/other');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('content', 200);
-        });
+        $response = $middleware->handle($request, fn ($req): Response => new Response('content', 200));
 
         $this->assertNull($response->getMaxAge());
     }
@@ -46,9 +42,7 @@ class CacheRobotsTxtTest extends TestCase
         $middleware = new CacheRobotsTxt;
         $request = Request::create('http://example.com/robots.txt');
 
-        $response = $middleware->handle($request, function ($req) {
-            return new Response('Not found', 404);
-        });
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Not found', 404));
 
         $this->assertNull($response->getMaxAge());
     }

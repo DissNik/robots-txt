@@ -7,6 +7,7 @@ use DissNik\RobotsTxt\Tests\TestCase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 
 class ConfigLoaderTest extends TestCase
 {
@@ -91,11 +92,10 @@ class ConfigLoaderTest extends TestCase
         $this->assertEquals(3600, $cacheConfig['duration']);
     }
 
-    private function invokeMethod(object $object, string $methodName, array $parameters = [])
+    private function invokeMethod(object $object, string $methodName, array $parameters = []): mixed
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass($object::class);
         $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
     }

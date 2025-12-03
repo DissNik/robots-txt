@@ -15,8 +15,8 @@ class InvalidUsageTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forEnvironment('dev', function ($env) {
-            $env->forUserAgent('*', function ($ctx) {
+        $builder->forEnvironment('dev', function ($env): void {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/admin/login');
             });
 
@@ -36,12 +36,12 @@ class InvalidUsageTest extends TestCase
         $builder->clear();
 
         $builder->sitemap('global-sitemap.xml')
-            ->forUserAgent('*', function ($ctx) {
+            ->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/');
             })
-            ->forEnvironment('production', function ($env) {
+            ->forEnvironment('production', function ($env): void {
                 $env->sitemap('prod-sitemap.xml')
-                    ->forUserAgent('Googlebot', function ($ctx) {
+                    ->forUserAgent('Googlebot', function ($ctx): void {
                         $ctx->crawlDelay(0.5);
                     });
             });

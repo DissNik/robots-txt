@@ -3,6 +3,7 @@
 namespace DissNik\RobotsTxt;
 
 use BadMethodCallException;
+use Closure;
 use DissNik\RobotsTxt\Contexts\EnvironmentContext;
 use DissNik\RobotsTxt\Contexts\UserAgentContext;
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
@@ -19,27 +20,16 @@ class RobotsTxtBuilder implements RobotsTxtInterface
 {
     use Conditionable;
 
-    private RuleManager $ruleManager;
-    private DirectiveManager $directiveManager;
-    private ConfigLoader $configLoader;
-    private EnvironmentRuleApplier $environmentApplier;
-    private ContentGenerator $contentGenerator;
     /** @var array<string, mixed> */
     private array $globalDirectives = [];
 
     public function __construct(
-        ConfigLoader $configLoader,
-        RuleManager $ruleManager,
-        DirectiveManager $directiveManager,
-        EnvironmentRuleApplier $environmentApplier,
-        ContentGenerator $contentGenerator
+        private ConfigLoader $configLoader,
+        private RuleManager $ruleManager,
+        private DirectiveManager $directiveManager,
+        private EnvironmentRuleApplier $environmentApplier,
+        private ContentGenerator $contentGenerator
     ) {
-        $this->configLoader = $configLoader;
-        $this->ruleManager = $ruleManager;
-        $this->directiveManager = $directiveManager;
-        $this->environmentApplier = $environmentApplier;
-        $this->contentGenerator = $contentGenerator;
-
         $this->loadConfig();
     }
 
@@ -73,7 +63,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
 
     protected function loadRulesForUserAgent(string $userAgent, array $rules): void
     {
-        $this->forUserAgent($userAgent, function ($context) use ($rules) {
+        $this->forUserAgent($userAgent, function ($context) use ($rules): void {
             foreach ($rules as $directive => $values) {
                 if (! empty($values)) {
                     if (is_array($values)) {
@@ -102,8 +92,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         $environments = (array) $environments;
 
-        // Сохраняем callback для выполнения позже, если окружение совпадёт
-        $this->environmentApplier->addCallback($environments, function (RobotsTxtInterface $robots) use ($callback) {
+        $this->environmentApplier->addCallback($environments, function (RobotsTxtInterface $robots) use ($callback): void {
             $context = new EnvironmentContext($robots, $this->environmentApplier, []);
             $callback($context);
         });
@@ -115,12 +104,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
-        if ($this->directiveManager->isGlobalSingleDirective($directive) ||
-            $this->directiveManager->isGlobalMultiDirective($directive)) {
-            $this->directiveManager->addGlobalDirective($directive, $value, $this->globalDirectives);
-        } else {
-            $this->directiveManager->addGlobalDirective($directive, $value, $this->globalDirectives);
-        }
+        $this->directiveManager->addGlobalDirective($directive, $value, $this->globalDirectives);
 
         return $this;
     }
@@ -149,14 +133,14 @@ class RobotsTxtBuilder implements RobotsTxtInterface
 
     public function blockAll(): self
     {
-        return $this->forUserAgent('*', function ($context) {
+        return $this->forUserAgent('*', function ($context): void {
             $context->blockAll();
         });
     }
 
     public function allowAll(): self
     {
-        return $this->forUserAgent('*', function ($context) {
+        return $this->forUserAgent('*', function ($context): void {
             $context->allowAll();
         });
     }
@@ -273,10 +257,10 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     protected function getCallbackDescription(callable $callback): string
     {
         if (is_array($callback) && count($callback) === 2) {
-            return get_class($callback[0]).'::'.$callback[1];
+            return $callback[0]::class.'::'.$callback[1];
         }
 
-        if ($callback instanceof \Closure) {
+        if ($callback instanceof Closure) {
             return 'Closure';
         }
 

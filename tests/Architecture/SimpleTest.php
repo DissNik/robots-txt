@@ -17,7 +17,7 @@ class SimpleTest extends TestCase
         $builder->sitemap('sitemap.xml')
             ->host('example.com');
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/admin');
         });
@@ -38,13 +38,13 @@ class SimpleTest extends TestCase
         $builder->clear();
 
         $builder->sitemap('global.xml')
-            ->forUserAgent('*', function ($ctx) {
+            ->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/')
                     ->disallow('/admin');
             })
-            ->forEnvironment('production', function ($env) {
+            ->forEnvironment('production', function ($env): void {
                 $env->sitemap('prod.xml')
-                    ->forUserAgent('Googlebot', function ($ctx) {
+                    ->forUserAgent('Googlebot', function ($ctx): void {
                         $ctx->crawlDelay(0.5);
                     });
             });

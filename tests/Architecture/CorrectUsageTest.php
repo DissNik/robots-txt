@@ -21,36 +21,36 @@ class CorrectUsageTest extends TestCase
             ->directive('X-Custom', 'value');
 
         // 2. Правила для user-agent'ов
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/admin')
                 ->disallow('/private')
                 ->crawlDelay(1.0)
-                ->when(true, function ($ctx) {
+                ->when(true, function ($ctx): void {
                     $ctx->allow('/public');
                 });
         });
 
-        $builder->forUserAgent('Googlebot', function ($ctx) {
+        $builder->forUserAgent('Googlebot', function ($ctx): void {
             $ctx->allow('/')
                 ->disallow('/no-google')
                 ->crawlDelay(0.5)
                 ->directive('Googlebot-News', 'sitemap_news.xml');
         });
 
-        $builder->forEnvironment('production', function ($env) {
+        $builder->forEnvironment('production', function ($env): void {
             $env->sitemap('https://prod.site.com/sitemap.xml')
                 // Не добавляем host здесь, так как он перезапишет глобальный
-                ->forUserAgent('*', function ($ctx) {
+                ->forUserAgent('*', function ($ctx): void {
                     $ctx->allow('/api'); // Только в production
                 })
-                ->when(app()->environment('production'), function ($env) {
+                ->when(app()->environment('production'), function ($env): void {
                     $env->directive('X-Production', 'true');
                 });
         });
 
-        $builder->forEnvironment(['local', 'staging'], function ($env) {
-            $env->forUserAgent('*', function ($ctx) {
+        $builder->forEnvironment(['local', 'staging'], function ($env): void {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->blockAll(); // Блокируем всё на тестовых
             });
         });
@@ -81,19 +81,19 @@ class CorrectUsageTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $builder->allow('/');
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/');
         });
 
         $builder->clear();
-        $builder->forEnvironment('prod', function ($env) {
+        $builder->forEnvironment('prod', function ($env): void {
             $this->expectException(BadMethodCallException::class);
             $env->allow('/');
         });
 
         $builder->clear();
-        $builder->forEnvironment('prod', function ($env) {
-            $env->forUserAgent('*', function ($ctx) {
+        $builder->forEnvironment('prod', function ($env): void {
+            $env->forUserAgent('*', function ($ctx): void {
                 $ctx->allow('/');
             });
         });
@@ -115,7 +115,7 @@ class CorrectUsageTest extends TestCase
         $this->assertStringContainsString('Allow: /', $content);
 
         $builder->clear();
-        $builder->forUserAgent('Googlebot', function ($ctx) {
+        $builder->forUserAgent('Googlebot', function ($ctx): void {
             $ctx->blockAll();
         });
         $content = $builder->generate();

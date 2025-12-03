@@ -6,18 +6,10 @@ use DissNik\RobotsTxt\Services\DirectiveManager;
 
 class RobotsTxtRule
 {
-    protected string $userAgent;
-
     /** @var array<string, mixed> */
     protected array $directives = [];
 
-    protected DirectiveManager $directiveManager;
-
-    public function __construct(string $userAgent = '*', ?DirectiveManager $directiveManager = null)
-    {
-        $this->userAgent = $userAgent;
-        $this->directiveManager = $directiveManager ?? new DirectiveManager;
-    }
+    public function __construct(protected string $userAgent = '*', protected ?DirectiveManager $directiveManager = new DirectiveManager) {}
 
     public function directive(string $directive, $value): self
     {
@@ -69,7 +61,7 @@ class RobotsTxtRule
 
             $this->directives[$directive] = array_filter(
                 $this->directives[$directive],
-                fn ($item) => $item !== $value
+                fn ($item): bool => $item !== $value
             );
 
             if (empty($this->directives[$directive])) {
@@ -91,12 +83,12 @@ class RobotsTxtRule
         foreach ($sortedDirectives as $directive => $values) {
             if ($this->directiveManager->isUserAgentSingleDirective($directive)) {
                 if (! empty($values)) {
-                    $lines[] = ucfirst($directive).': '.$values;
+                    $lines[] = ucfirst((string) $directive).': '.$values;
                 }
             } else {
                 foreach ($values as $value) {
                     if (! empty($value)) {
-                        $lines[] = ucfirst($directive).': '.$value;
+                        $lines[] = ucfirst((string) $directive).': '.$value;
                     }
                 }
             }
@@ -116,12 +108,12 @@ class RobotsTxtRule
 
         $this->directives['disallow'] = array_filter(
             $disallow,
-            fn ($path) => ! in_array($path, $allow, true)
+            fn ($path): bool => ! in_array($path, $allow, true)
         );
 
         foreach (['allow', 'disallow'] as $directive) {
             if (isset($this->directives[$directive])) {
-                usort($this->directives[$directive], function ($a, $b) {
+                usort($this->directives[$directive], function ($a, $b): int {
                     $depthA = substr_count($a, '/');
                     $depthB = substr_count($b, '/');
 
@@ -212,6 +204,6 @@ class RobotsTxtRule
 
     public function isEmpty(): bool
     {
-        return empty($this->directives);
+        return $this->directives === [];
     }
 }

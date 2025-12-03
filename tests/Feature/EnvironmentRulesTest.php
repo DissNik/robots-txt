@@ -23,11 +23,11 @@ class EnvironmentRulesTest extends TestCase
             ->andReturn('production');
 
         RobotsTxt::forEnvironment('production', function ($robots): void {
-            $robots->forUserAgent('*', function ($context) {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->allow('/');
             });
         })->forEnvironment('local', function ($robots): void {
-            $robots->forUserAgent('*', function ($context) {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->disallow('/');
             });
         });
@@ -46,7 +46,7 @@ class EnvironmentRulesTest extends TestCase
             ->andReturn('staging');
 
         RobotsTxt::forEnvironment(['staging', 'production'], function ($robots): void {
-            $robots->forUserAgent('*', function ($context) {
+            $robots->forUserAgent('*', function ($context): void {
                 $context->disallow('/admin');
             });
         });
@@ -64,7 +64,7 @@ class EnvironmentRulesTest extends TestCase
             ->andReturn('production');
 
         RobotsTxt::forEnvironment('local', function ($env): void {
-            $env->forUserAgent('*', function ($context) {
+            $env->forUserAgent('*', function ($context): void {
                 $context->disallow('/');
             });
         });

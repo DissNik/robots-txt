@@ -24,7 +24,7 @@ return [
     'environments' => [
         'production' => [
             // Global directives for production environment
-            'sitemap' => rtrim(env('APP_URL', 'http://localhost'), '/') . '/sitemap.xml',
+            'sitemap' => rtrim(env('APP_URL', 'http://localhost'), '/').'/sitemap.xml',
 
             // User-agent specific rules for production
             'user_agents' => [

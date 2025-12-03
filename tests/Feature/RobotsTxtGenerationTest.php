@@ -17,7 +17,7 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function generates_basic_robots_txt(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/admin')
                 ->allow('/public');
         });
@@ -56,16 +56,16 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function handles_multiple_user_agents(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/admin');
         });
 
-        RobotsTxt::forUserAgent('Googlebot', function ($context) {
+        RobotsTxt::forUserAgent('Googlebot', function ($context): void {
             $context->disallow('/private')
                 ->crawlDelay(1.0);
         });
 
-        RobotsTxt::forUserAgent('Bingbot', function ($context) {
+        RobotsTxt::forUserAgent('Bingbot', function ($context): void {
             $context->disallow('/search');
         });
 
@@ -84,7 +84,7 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function resolves_conflicts_between_allow_and_disallow(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/admin')
                 ->allow('/admin/login');
         });
@@ -106,7 +106,7 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function handles_crawl_delay_with_decimal(): void
     {
-        RobotsTxt::forUserAgent('Googlebot', function ($context) {
+        RobotsTxt::forUserAgent('Googlebot', function ($context): void {
             $context->crawlDelay(1.5);
         });
 
@@ -135,11 +135,11 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function generates_proper_format_with_line_breaks(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/admin');
         });
 
-        RobotsTxt::forUserAgent('Googlebot', function ($context) {
+        RobotsTxt::forUserAgent('Googlebot', function ($context): void {
             $context->disallow('/private');
         });
 
@@ -154,14 +154,14 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function generates_complete_robots_txt_example(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->allow('/')
                 ->disallow('/admin/')
                 ->disallow('/private/')
                 ->crawlDelay(1.0);
         });
 
-        RobotsTxt::forUserAgent('Googlebot', function ($context) {
+        RobotsTxt::forUserAgent('Googlebot', function ($context): void {
             $context->allow('/')
                 ->disallow('/nogooglebot/')
                 ->crawlDelay(2.0);
@@ -187,7 +187,7 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function handles_special_characters_in_paths(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('/search?q=*')
                 ->allow('/public/images/');
         });
@@ -219,7 +219,7 @@ class RobotsTxtGenerationTest extends TestCase
     #[Test]
     public function properly_handles_empty_paths(): void
     {
-        RobotsTxt::forUserAgent('*', function ($context) {
+        RobotsTxt::forUserAgent('*', function ($context): void {
             $context->disallow('')
                 ->allow('');
         });

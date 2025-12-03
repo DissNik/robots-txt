@@ -51,7 +51,7 @@ class ProtectionTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->allow('/');
         });
 
@@ -65,7 +65,7 @@ class ProtectionTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->disallow('/admin');
         });
 
@@ -79,7 +79,7 @@ class ProtectionTest extends TestCase
         $builder = app(RobotsTxtBuilder::class);
         $builder->clear();
 
-        $builder->forUserAgent('*', function ($ctx) {
+        $builder->forUserAgent('*', function ($ctx): void {
             $ctx->crawlDelay(1.5);
         });
 
