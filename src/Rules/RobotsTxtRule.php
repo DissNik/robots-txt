@@ -11,7 +11,7 @@ class RobotsTxtRule
 
     public function __construct(
         protected string $userAgent = '*',
-        private readonly DirectiveManager $directiveManager = new DirectiveManager
+        private readonly DirectiveManager $directiveManager = new DirectiveManager(),
     ) {
         //
     }
@@ -66,7 +66,7 @@ class RobotsTxtRule
 
             $this->directives[$directive] = array_filter(
                 $this->directives[$directive],
-                fn ($item): bool => $item !== $value
+                fn ($item): bool => $item !== $value,
             );
 
             if (empty($this->directives[$directive])) {
@@ -113,7 +113,7 @@ class RobotsTxtRule
 
         $this->directives['disallow'] = array_filter(
             $disallow,
-            fn ($path): bool => ! in_array($path, $allow, true)
+            fn ($path): bool => ! in_array($path, $allow, true),
         );
 
         foreach (['allow', 'disallow'] as $directive) {

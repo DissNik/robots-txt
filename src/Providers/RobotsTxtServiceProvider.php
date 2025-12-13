@@ -27,7 +27,8 @@ class RobotsTxtServiceProvider extends ServiceProvider implements DeferrableProv
         $this->app->alias(RobotsTxtInterface::class, 'robots-txt');
 
         $this->mergeConfigFrom(
-            $this->basePath.'/config/robots-txt.php', 'robots-txt'
+            $this->basePath.'/config/robots-txt.php',
+            'robots-txt',
         );
     }
 

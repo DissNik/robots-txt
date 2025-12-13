@@ -28,7 +28,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         private readonly RuleManager $ruleManager,
         private readonly DirectiveManager $directiveManager,
         private readonly EnvironmentRuleApplier $environmentApplier,
-        private readonly ContentGenerator $contentGenerator
+        private readonly ContentGenerator $contentGenerator,
     ) {
         $this->loadConfig();
     }
@@ -205,7 +205,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
 
         return $this->contentGenerator->generate(
             $indexedRuleObjects,
-            $this->globalDirectives
+            $this->globalDirectives,
         );
     }
 
@@ -325,7 +325,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method allow() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->allow(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->allow(...))',
         );
     }
 
@@ -336,7 +336,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method disallow() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->disallow(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->disallow(...))',
         );
     }
 
@@ -347,7 +347,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method crawlDelay() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->crawlDelay(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->crawlDelay(...))',
         );
     }
 

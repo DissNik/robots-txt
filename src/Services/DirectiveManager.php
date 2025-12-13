@@ -138,7 +138,7 @@ class DirectiveManager
             if (is_array($value)) {
                 $globalDirectives[$directive] = array_merge(
                     $globalDirectives[$directive],
-                    $value
+                    $value,
                 );
             } else {
                 $globalDirectives[$directive][] = $value;
@@ -166,7 +166,7 @@ class DirectiveManager
         } else {
             $globalDirectives[$directive] = array_filter(
                 $globalDirectives[$directive],
-                fn ($item): bool => $item !== $value
+                fn ($item): bool => $item !== $value,
             );
 
             if (empty($globalDirectives[$directive])) {

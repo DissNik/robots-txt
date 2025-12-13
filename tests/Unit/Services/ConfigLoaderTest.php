@@ -16,7 +16,7 @@ class ConfigLoaderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->configLoader = new ConfigLoader;
+        $this->configLoader = new ConfigLoader();
     }
 
     #[Test]

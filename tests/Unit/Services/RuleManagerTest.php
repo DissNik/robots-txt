@@ -14,7 +14,7 @@ class RuleManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->ruleManager = new RuleManager(new DirectiveManager);
+        $this->ruleManager = new RuleManager(new DirectiveManager());
     }
 
     #[Test]

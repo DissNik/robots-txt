@@ -20,10 +20,10 @@ class RobotsTxtBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $configLoader = new ConfigLoader;
-        $directiveManager = new DirectiveManager;
+        $configLoader = new ConfigLoader();
+        $directiveManager = new DirectiveManager();
         $ruleManager = new RuleManager($directiveManager);
-        $environmentApplier = new EnvironmentRuleApplier;
+        $environmentApplier = new EnvironmentRuleApplier();
         $contentGenerator = new ContentGenerator($directiveManager);
 
         $this->manager = new RobotsTxtBuilder(
@@ -31,7 +31,7 @@ class RobotsTxtBuilderTest extends TestCase
             $ruleManager,
             $directiveManager,
             $environmentApplier,
-            $contentGenerator
+            $contentGenerator,
         );
 
         $this->manager->clear();
