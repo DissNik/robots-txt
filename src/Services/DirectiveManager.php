@@ -42,6 +42,10 @@ class DirectiveManager
         return strtolower(trim($directive));
     }
 
+    /**
+     * @param array<string, mixed> $directives
+     * @return array<string, mixed>
+     */
     public function sortGlobalDirectives(array $directives): array
     {
         $order = ['host', 'sitemap', 'clean-param'];
@@ -62,6 +66,10 @@ class DirectiveManager
         return $sorted;
     }
 
+    /**
+     * @param array<string, mixed> $directives
+     * @return array<string, mixed>
+     */
     public function sortUserAgentDirectives(array $directives): array
     {
         $order = ['allow', 'disallow', 'crawl-delay', 'clean-param', 'visit-time'];
@@ -86,7 +94,9 @@ class DirectiveManager
     {
         $path = trim($path);
 
-        $path = preg_replace('#/+#', '/', $path);
+        $normalized = preg_replace('#/+#', '/', $path);
+
+        $path = $normalized ?? $path;
 
         if (! empty($path) && $path !== '*' && ! str_starts_with($path, '/')) {
             return '/'.$path;
@@ -111,7 +121,10 @@ class DirectiveManager
             str_starts_with($path2WithSlash, $path1WithSlash);
     }
 
-    public function addGlobalDirective(string $directive, $value, array &$globalDirectives): void
+    /**
+     * @param array<string, mixed> $globalDirectives
+     */
+    public function addGlobalDirective(string $directive, mixed $value, array &$globalDirectives): void
     {
         $directive = $this->normalizeDirective($directive);
 
@@ -135,7 +148,10 @@ class DirectiveManager
         }
     }
 
-    public function removeGlobalDirective(string $directive, $value, array &$globalDirectives): void
+    /**
+     * @param array<string, mixed> $globalDirectives
+     */
+    public function removeGlobalDirective(string $directive, mixed $value, array &$globalDirectives): void
     {
         $directive = $this->normalizeDirective($directive);
 

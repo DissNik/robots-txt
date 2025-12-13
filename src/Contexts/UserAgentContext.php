@@ -46,7 +46,7 @@ class UserAgentContext
         return $this;
     }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $this->rule->directive($directive, $value);
 
@@ -68,7 +68,7 @@ class UserAgentContext
         return $this->rule;
     }
 
-    public function removeDirective(string $directive, $value = null): self
+    public function removeDirective(string $directive, mixed $value = null): self
     {
         $this->rule->removeDirective($directive, $value);
 

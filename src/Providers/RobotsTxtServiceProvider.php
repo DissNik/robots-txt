@@ -57,6 +57,9 @@ class RobotsTxtServiceProvider extends ServiceProvider implements DeferrableProv
             ->group($this->basePath.'/routes/robots-txt.php');
     }
 
+    /**
+     * @return array<string>
+     */
     protected function resolveMiddleware(): array
     {
         $middleware = config('robots-txt.route.middleware', []);
@@ -71,6 +74,9 @@ class RobotsTxtServiceProvider extends ServiceProvider implements DeferrableProv
         }
     }
 
+    /**
+     * @return array<string>
+     */
     public function provides(): array
     {
         return [RobotsTxtInterface::class];

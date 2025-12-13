@@ -38,7 +38,8 @@
         "larastan/larastan": "^3.0",
         "phpunit/phpunit": "^12.5",
         "orchestra/testbench": "^10.8",
-        "rector/rector": "^2.2"
+        "rector/rector": "^2.2",
+        "laravel/pint": "^1.26"
     },
     "scripts": {
         "test": "vendor/bin/phpunit",

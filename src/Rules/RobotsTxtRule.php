@@ -9,9 +9,14 @@ class RobotsTxtRule
     /** @var array<string, mixed> */
     protected array $directives = [];
 
-    public function __construct(protected string $userAgent = '*', protected ?DirectiveManager $directiveManager = new DirectiveManager) {}
+    public function __construct(
+        protected string $userAgent = '*',
+        private readonly DirectiveManager $directiveManager = new DirectiveManager()
+    ) {
+        //
+    }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
@@ -42,7 +47,7 @@ class RobotsTxtRule
         return $this;
     }
 
-    public function removeDirective(string $directive, $value = null): self
+    public function removeDirective(string $directive, mixed $value = null): self
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
@@ -128,6 +133,9 @@ class RobotsTxtRule
         return $this->userAgent;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDirectives(): array
     {
         return $this->directives;
@@ -149,6 +157,9 @@ class RobotsTxtRule
         return $this;
     }
 
+    /**
+     * @return array<array{directive: string, value: mixed, single: bool}>
+     */
     public function toArray(): array
     {
         $result = [];
@@ -176,6 +187,9 @@ class RobotsTxtRule
         return $result;
     }
 
+    /**
+     * @return array<array{disallow: string, allow: string}>
+     */
     public function hasConflicts(): array
     {
         $conflicts = [];

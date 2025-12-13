@@ -11,6 +11,7 @@ class EnvironmentContext
 {
     use Conditionable;
 
+    /** @var array<string> */
     private array $environments = [];
 
     public function __construct(private RobotsTxtInterface $robotsManager, private EnvironmentRuleApplier $environmentApplier)
@@ -46,7 +47,7 @@ class EnvironmentContext
         return $this;
     }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $this->robotsManager->directive($directive, $value);
 
@@ -78,6 +79,10 @@ class EnvironmentContext
         );
     }
 
+    /**
+     * @param array<mixed> $parameters
+     * @return mixed
+     */
     public function __call(string $method, array $parameters)
     {
         if (in_array($method, ['allow', 'disallow', 'crawlDelay'])) {
