@@ -43,7 +43,7 @@ class DirectiveManager
     }
 
     /**
-     * @param array<string, mixed> $directives
+     * @param  array<string, mixed>  $directives
      * @return array<string, mixed>
      */
     public function sortGlobalDirectives(array $directives): array
@@ -67,7 +67,7 @@ class DirectiveManager
     }
 
     /**
-     * @param array<string, mixed> $directives
+     * @param  array<string, mixed>  $directives
      * @return array<string, mixed>
      */
     public function sortUserAgentDirectives(array $directives): array
@@ -122,7 +122,7 @@ class DirectiveManager
     }
 
     /**
-     * @param array<string, mixed> $globalDirectives
+     * @param  array<string, mixed>  $globalDirectives
      */
     public function addGlobalDirective(string $directive, mixed $value, array &$globalDirectives): void
     {
@@ -149,7 +149,7 @@ class DirectiveManager
     }
 
     /**
-     * @param array<string, mixed> $globalDirectives
+     * @param  array<string, mixed>  $globalDirectives
      */
     public function removeGlobalDirective(string $directive, mixed $value, array &$globalDirectives): void
     {

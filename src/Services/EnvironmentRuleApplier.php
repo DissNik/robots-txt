@@ -11,7 +11,7 @@ class EnvironmentRuleApplier
     private array $environmentCallbacks = [];
 
     /**
-     * @param string|array<string> $environments
+     * @param  string|array<string>  $environments
      */
     public function addCallback(string|array $environments, callable $callback): string
     {
@@ -21,7 +21,7 @@ class EnvironmentRuleApplier
             ? spl_object_hash($callback)
             : md5(serialize($callback));
 
-        $key = md5(serialize($environments) . $callbackId);
+        $key = md5(serialize($environments).$callbackId);
 
         $this->environmentCallbacks[$key] = [
             'environments' => $environments,

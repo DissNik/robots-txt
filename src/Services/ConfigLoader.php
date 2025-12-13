@@ -32,7 +32,7 @@ class ConfigLoader
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      * @return array{global_directives: array<string, mixed>, user_agent_rules: array<string, mixed>}
      */
     protected function normalizeConfig(array $config): array

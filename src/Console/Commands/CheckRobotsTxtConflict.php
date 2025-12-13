@@ -289,6 +289,6 @@ class CheckRobotsTxtConflict extends Command
         $pow = min($pow, count($units) - 1);
         $bytes /= 1024 ** $pow;
 
-        return round($bytes, $precision).' '.$units[(int)$pow];
+        return round($bytes, $precision).' '.$units[(int) $pow];
     }
 }

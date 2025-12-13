@@ -80,7 +80,7 @@ class EnvironmentContext
     }
 
     /**
-     * @param array<mixed> $parameters
+     * @param  array<mixed>  $parameters
      * @return mixed
      */
     public function __call(string $method, array $parameters)

@@ -42,7 +42,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     }
 
     /**
-     * @param array<string, mixed> $directives
+     * @param  array<string, mixed>  $directives
      */
     protected function loadGlobalDirectives(array $directives): void
     {
@@ -54,7 +54,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     }
 
     /**
-     * @param array<string, mixed> $rules
+     * @param  array<string, mixed>  $rules
      */
     protected function loadUserAgentRules(array $rules): void
     {
@@ -68,7 +68,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     }
 
     /**
-     * @param array<string, mixed> $rules
+     * @param  array<string, mixed>  $rules
      */
     protected function loadRulesForUserAgent(string $userAgent, array $rules): void
     {
@@ -98,7 +98,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     }
 
     /**
-     * @param string|array<string> $environments
+     * @param  string|array<string>  $environments
      */
     public function forEnvironment(string|array $environments, callable $callback): self
     {

@@ -29,7 +29,7 @@ interface RobotsTxtInterface
     public function forUserAgent(string $userAgent, callable $callback): self;
 
     /**
-     * @param string|array<string> $environments
+     * @param  string|array<string>  $environments
      */
     public function forEnvironment(string|array $environments, callable $callback): self;
 

@@ -6,13 +6,14 @@ use DissNik\RobotsTxt\Rules\RobotsTxtRule;
 
 class ContentGenerator
 {
-    public function __construct(private readonly DirectiveManager $directiveManager) {
+    public function __construct(private readonly DirectiveManager $directiveManager)
+    {
         //
     }
 
     /**
-     * @param array<int, RobotsTxtRule> $userAgentRules
-     * @param array<string, mixed> $globalDirectives
+     * @param  array<int, RobotsTxtRule>  $userAgentRules
+     * @param  array<string, mixed>  $globalDirectives
      */
     public function generate(array $userAgentRules, array $globalDirectives): string
     {

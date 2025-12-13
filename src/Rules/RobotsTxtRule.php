@@ -11,7 +11,7 @@ class RobotsTxtRule
 
     public function __construct(
         protected string $userAgent = '*',
-        private readonly DirectiveManager $directiveManager = new DirectiveManager()
+        private readonly DirectiveManager $directiveManager = new DirectiveManager
     ) {
         //
     }
