@@ -10,7 +10,10 @@ class UserAgentContext
 {
     use Conditionable;
 
-    public function __construct(private RobotsTxtRule $rule, private DirectiveManager $directiveManager) {}
+    public function __construct(private RobotsTxtRule $rule, private DirectiveManager $directiveManager)
+    {
+        //
+    }
 
     public function allow(string $path): self
     {
@@ -43,7 +46,7 @@ class UserAgentContext
         return $this;
     }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $this->rule->directive($directive, $value);
 
@@ -65,7 +68,7 @@ class UserAgentContext
         return $this->rule;
     }
 
-    public function removeDirective(string $directive, $value = null): self
+    public function removeDirective(string $directive, mixed $value = null): self
     {
         $this->rule->removeDirective($directive, $value);
 

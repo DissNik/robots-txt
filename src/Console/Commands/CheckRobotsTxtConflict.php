@@ -50,9 +50,16 @@ class CheckRobotsTxtConflict extends Command
     {
         error('⚠️  ROBOTS.TXT CONFLICT DETECTED');
 
+        $fileSize = @filesize($path);
         $this->components->twoColumnDetail('File location', $path);
-        $this->components->twoColumnDetail('File size', $this->formatBytes(filesize($path)));
-        $this->components->twoColumnDetail('File modified', date('Y-m-d H:i:s', filemtime($path)));
+        $this->components->twoColumnDetail('File size', $fileSize ? $this->formatBytes($fileSize) : 'Unknown');
+
+        $fileModifiedTime = @filemtime($path);
+        $this->components->twoColumnDetail(
+            'File modified',
+            $fileModifiedTime ? date('Y-m-d H:i:s', $fileModifiedTime) : 'Unknown',
+        );
+
         $this->components->twoColumnDetail('Package route', route('robots-txt', absolute: false));
 
         warning("\nThis file will override package rules! The package robots.txt will not be accessible.");
@@ -91,7 +98,7 @@ class CheckRobotsTxtConflict extends Command
                 'view' => 'View file contents',
                 'ignore' => 'Do nothing (package rules will not work!)',
             ],
-            default: 'rename'
+            default: 'rename',
         );
 
         return match ($choice) {
@@ -205,7 +212,7 @@ class CheckRobotsTxtConflict extends Command
                 '%s.backup_%s%s',
                 $baseName,
                 $timestamp,
-                $counter > 1 ? "_{$counter}" : ''
+                $counter > 1 ? "_{$counter}" : '',
             );
             $backupPath = $dirName.'/'.$backupName;
             $counter++;
@@ -282,6 +289,6 @@ class CheckRobotsTxtConflict extends Command
         $pow = min($pow, count($units) - 1);
         $bytes /= 1024 ** $pow;
 
-        return round($bytes, $precision).' '.$units[$pow];
+        return round($bytes, $precision).' '.$units[(int) $pow];
     }
 }

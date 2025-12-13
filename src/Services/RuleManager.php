@@ -28,6 +28,9 @@ class RuleManager
         return $this->ensureRuleExists($userAgent);
     }
 
+    /**
+     * @return array<string, array<array{directive: string, value: mixed, single: bool}>>
+     */
     public function getRules(): array
     {
         $result = [];
@@ -38,14 +41,20 @@ class RuleManager
         return $result;
     }
 
+    /**
+     * @return array<string, RobotsTxtRule>
+     */
     public function getRuleObjects(): array
     {
         return $this->userAgentRules;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getUserAgentDirectives(string $userAgent): array
     {
-        return $this->ensureRuleExists($userAgent)->getDirectives() ?? [];
+        return $this->ensureRuleExists($userAgent)->getDirectives();
     }
 
     public function clear(): void
@@ -54,6 +63,9 @@ class RuleManager
         $this->ensureRuleExists('*');
     }
 
+    /**
+     * @return array<string, array<array{disallow: string, allow: string}>>
+     */
     public function checkConflicts(): array
     {
         $conflicts = [];
@@ -67,6 +79,9 @@ class RuleManager
         return $conflicts;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getUserAgents(): array
     {
         return array_keys($this->userAgentRules);
@@ -77,7 +92,7 @@ class RuleManager
         return isset($this->userAgentRules[$userAgent]);
     }
 
-    public function removeUserAgentDirective(string $userAgent, string $directive, $value = null): self
+    public function removeUserAgentDirective(string $userAgent, string $directive, mixed $value = null): self
     {
         if (! isset($this->userAgentRules[$userAgent])) {
             return $this;

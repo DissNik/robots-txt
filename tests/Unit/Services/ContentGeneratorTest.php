@@ -15,7 +15,7 @@ class ContentGeneratorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->generator = new ContentGenerator(new DirectiveManager);
+        $this->generator = new ContentGenerator(new DirectiveManager());
     }
 
     #[Test]

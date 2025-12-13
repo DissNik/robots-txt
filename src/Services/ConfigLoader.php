@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Config;
 
 class ConfigLoader
 {
+    /**
+     * @return array{global_directives: array<string, mixed>, user_agent_rules: array<string, mixed>}
+     */
     public function loadForCurrentEnvironment(): array
     {
         $currentEnv = App::environment();
@@ -28,6 +31,10 @@ class ConfigLoader
         return $this->normalizeConfig($envConfig);
     }
 
+    /**
+     * @param  array<string, mixed>  $config
+     * @return array{global_directives: array<string, mixed>, user_agent_rules: array<string, mixed>}
+     */
     protected function normalizeConfig(array $config): array
     {
         $normalized = [
@@ -48,11 +55,20 @@ class ConfigLoader
         return $normalized;
     }
 
+    /**
+     * @return array{enabled: bool, duration: int}
+     */
     public function getCacheConfig(): array
     {
-        return Config::get('robots-txt.cache', [
+        /** @var array{enabled?: bool, duration?: int} */
+        $cacheConfig = Config::get('robots-txt.cache', [
             'enabled' => true,
             'duration' => 3600,
         ]);
+
+        return [
+            'enabled' => $cacheConfig['enabled'] ?? true,
+            'duration' => $cacheConfig['duration'] ?? 3600,
+        ];
     }
 }

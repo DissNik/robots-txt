@@ -1,6 +1,6 @@
 <?php
 
-namespace DissNik\RobotsTxt;
+namespace DissNik\RobotsTxt\Builders;
 
 use BadMethodCallException;
 use Closure;
@@ -24,11 +24,11 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     private array $globalDirectives = [];
 
     public function __construct(
-        private ConfigLoader $configLoader,
-        private RuleManager $ruleManager,
-        private DirectiveManager $directiveManager,
-        private EnvironmentRuleApplier $environmentApplier,
-        private ContentGenerator $contentGenerator
+        private readonly ConfigLoader $configLoader,
+        private readonly RuleManager $ruleManager,
+        private readonly DirectiveManager $directiveManager,
+        private readonly EnvironmentRuleApplier $environmentApplier,
+        private readonly ContentGenerator $contentGenerator,
     ) {
         $this->loadConfig();
     }
@@ -37,10 +37,13 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         $config = $this->configLoader->loadForCurrentEnvironment();
 
-        $this->loadGlobalDirectives($config['global_directives'] ?? []);
-        $this->loadUserAgentRules($config['user_agent_rules'] ?? []);
+        $this->loadGlobalDirectives($config['global_directives']);
+        $this->loadUserAgentRules($config['user_agent_rules']);
     }
 
+    /**
+     * @param  array<string, mixed>  $directives
+     */
     protected function loadGlobalDirectives(array $directives): void
     {
         foreach ($directives as $directive => $value) {
@@ -50,6 +53,9 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $rules
+     */
     protected function loadUserAgentRules(array $rules): void
     {
         foreach ($rules as $userAgent => $agentRules) {
@@ -61,6 +67,9 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $rules
+     */
     protected function loadRulesForUserAgent(string $userAgent, array $rules): void
     {
         $this->forUserAgent($userAgent, function ($context) use ($rules): void {
@@ -88,19 +97,22 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         return $this;
     }
 
+    /**
+     * @param  string|array<string>  $environments
+     */
     public function forEnvironment(string|array $environments, callable $callback): self
     {
         $environments = (array) $environments;
 
         $this->environmentApplier->addCallback($environments, function (RobotsTxtInterface $robots) use ($callback): void {
-            $context = new EnvironmentContext($robots, $this->environmentApplier, []);
+            $context = new EnvironmentContext($robots, $this->environmentApplier);
             $callback($context);
         });
 
         return $this;
     }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
@@ -145,14 +157,14 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         });
     }
 
-    public function removeDirective(string $directive, $value = null): self
+    public function removeDirective(string $directive, mixed $value = null): self
     {
         $this->directiveManager->removeGlobalDirective($directive, $value, $this->globalDirectives);
 
         return $this;
     }
 
-    public function removeUserAgentDirective(string $userAgent, string $directive, $value = null): self
+    public function removeUserAgentDirective(string $userAgent, string $directive, mixed $value = null): self
     {
         $this->ruleManager->removeUserAgentDirective($userAgent, $directive, $value);
 
@@ -172,14 +184,14 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         $cacheConfig = $this->configLoader->getCacheConfig();
 
-        return $cacheConfig['enabled'] ?? true;
+        return $cacheConfig['enabled'];
     }
 
     protected function getCachedContent(): string
     {
         $cacheConfig = $this->configLoader->getCacheConfig();
         $cacheKey = 'robots_txt_content_'.App::environment();
-        $cacheDuration = $cacheConfig['duration'] ?? 3600;
+        $cacheDuration = $cacheConfig['duration'];
 
         return Cache::remember($cacheKey, $cacheDuration, fn (): string => $this->buildContent());
     }
@@ -188,9 +200,12 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         $this->environmentApplier->applyCallbacks($this);
 
+        $ruleObjects = $this->ruleManager->getRuleObjects();
+        $indexedRuleObjects = array_values($ruleObjects);
+
         return $this->contentGenerator->generate(
-            $this->ruleManager->getRuleObjects(),
-            $this->globalDirectives
+            $indexedRuleObjects,
+            $this->globalDirectives,
         );
     }
 
@@ -217,11 +232,17 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         return Cache::forget('robots_txt_content_'.App::environment());
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getRules(): array
     {
         return $this->ruleManager->getRules();
     }
 
+    /**
+     * @return array<string>
+     */
     public function getSitemaps(): array
     {
         $sitemaps = $this->globalDirectives['sitemap'] ?? [];
@@ -229,16 +250,25 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         return is_array($sitemaps) ? $sitemaps : [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDirectives(): array
     {
         return $this->globalDirectives;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getUserAgentDirectives(string $userAgent): array
     {
         return $this->ruleManager->getUserAgentDirectives($userAgent);
     }
 
+    /**
+     * @return array<string, array{environments: array<string>, callback: string}>
+     */
     public function getEnvironmentRules(): array
     {
         $callbacks = $this->environmentApplier->getCallbacks();
@@ -267,11 +297,17 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         return 'Unknown';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function checkConflicts(): array
     {
         return $this->ruleManager->checkConflicts();
     }
 
+    /**
+     * @return array<string>
+     */
     public function getUserAgents(): array
     {
         return $this->ruleManager->getUserAgents();
@@ -289,7 +325,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method allow() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->allow(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->allow(...))',
         );
     }
 
@@ -300,7 +336,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method disallow() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->disallow(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->disallow(...))',
         );
     }
 
@@ -311,7 +347,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     {
         throw new BadMethodCallException(
             'Method crawlDelay() can only be called inside forUserAgent() callback. '.
-            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->crawlDelay(...))'
+            'Usage: RobotsTxt::forUserAgent(\'*\', fn($ctx) => $ctx->crawlDelay(...))',
         );
     }
 

@@ -2,7 +2,7 @@
 
 namespace DissNik\RobotsTxt\Tests;
 
-use DissNik\RobotsTxt\RobotsTxtServiceProvider;
+use DissNik\RobotsTxt\Providers\RobotsTxtServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase

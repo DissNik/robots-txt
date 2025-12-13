@@ -9,9 +9,14 @@ class RobotsTxtRule
     /** @var array<string, mixed> */
     protected array $directives = [];
 
-    public function __construct(protected string $userAgent = '*', protected ?DirectiveManager $directiveManager = new DirectiveManager) {}
+    public function __construct(
+        protected string $userAgent = '*',
+        private readonly DirectiveManager $directiveManager = new DirectiveManager(),
+    ) {
+        //
+    }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
@@ -42,7 +47,7 @@ class RobotsTxtRule
         return $this;
     }
 
-    public function removeDirective(string $directive, $value = null): self
+    public function removeDirective(string $directive, mixed $value = null): self
     {
         $directive = $this->directiveManager->normalizeDirective($directive);
 
@@ -61,7 +66,7 @@ class RobotsTxtRule
 
             $this->directives[$directive] = array_filter(
                 $this->directives[$directive],
-                fn ($item): bool => $item !== $value
+                fn ($item): bool => $item !== $value,
             );
 
             if (empty($this->directives[$directive])) {
@@ -108,7 +113,7 @@ class RobotsTxtRule
 
         $this->directives['disallow'] = array_filter(
             $disallow,
-            fn ($path): bool => ! in_array($path, $allow, true)
+            fn ($path): bool => ! in_array($path, $allow, true),
         );
 
         foreach (['allow', 'disallow'] as $directive) {
@@ -128,6 +133,9 @@ class RobotsTxtRule
         return $this->userAgent;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDirectives(): array
     {
         return $this->directives;
@@ -149,6 +157,9 @@ class RobotsTxtRule
         return $this;
     }
 
+    /**
+     * @return array<array{directive: string, value: mixed, single: bool}>
+     */
     public function toArray(): array
     {
         $result = [];
@@ -176,6 +187,9 @@ class RobotsTxtRule
         return $result;
     }
 
+    /**
+     * @return array<array{disallow: string, allow: string}>
+     */
     public function hasConflicts(): array
     {
         $conflicts = [];

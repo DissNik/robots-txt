@@ -16,7 +16,7 @@ class CacheRobotsTxtTest extends TestCase
         config(['robots-txt.cache.enabled' => true]);
         config(['robots-txt.cache.duration' => 3600]);
 
-        $middleware = new CacheRobotsTxt;
+        $middleware = new CacheRobotsTxt();
         $request = Request::create('http://example.com/robots.txt');
 
         $response = $middleware->handle($request, fn ($req): Response => new Response('content', 200));
@@ -28,7 +28,7 @@ class CacheRobotsTxtTest extends TestCase
     #[Test]
     public function middleware_ignores_non_robots(): void
     {
-        $middleware = new CacheRobotsTxt;
+        $middleware = new CacheRobotsTxt();
         $request = Request::create('http://example.com/other');
 
         $response = $middleware->handle($request, fn ($req): Response => new Response('content', 200));
@@ -39,7 +39,7 @@ class CacheRobotsTxtTest extends TestCase
     #[Test]
     public function middleware_handles_non_200(): void
     {
-        $middleware = new CacheRobotsTxt;
+        $middleware = new CacheRobotsTxt();
         $request = Request::create('http://example.com/robots.txt');
 
         $response = $middleware->handle($request, fn ($req): Response => new Response('Not found', 404));

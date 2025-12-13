@@ -3,7 +3,7 @@
 namespace DissNik\RobotsTxt\Tests\Unit;
 
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
-use DissNik\RobotsTxt\RobotsTxtServiceProvider;
+use DissNik\RobotsTxt\Providers\RobotsTxtServiceProvider;
 use DissNik\RobotsTxt\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 

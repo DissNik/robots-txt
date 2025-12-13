@@ -11,10 +11,13 @@ class EnvironmentContext
 {
     use Conditionable;
 
-    private array $environments;
+    /** @var array<string> */
+    private array $environments = [];
 
-    public function __construct(private RobotsTxtInterface $robotsManager, private EnvironmentRuleApplier $environmentApplier)
-    {
+    public function __construct(
+        private readonly RobotsTxtInterface $robotsManager,
+        private readonly EnvironmentRuleApplier $environmentApplier,
+    ) {
         //
     }
 
@@ -46,7 +49,7 @@ class EnvironmentContext
         return $this;
     }
 
-    public function directive(string $directive, $value): self
+    public function directive(string $directive, mixed $value): self
     {
         $this->robotsManager->directive($directive, $value);
 
@@ -74,17 +77,21 @@ class EnvironmentContext
             function (RobotsTxtInterface $robots): void {
                 // All methods have already been called during configuration
                 // This callback ensures the environment is registered
-            }
+            },
         );
     }
 
+    /**
+     * @param array<mixed> $parameters
+     * @return mixed
+     */
     public function __call(string $method, array $parameters)
     {
         if (in_array($method, ['allow', 'disallow', 'crawlDelay'])) {
             throw new BadMethodCallException(
-                "Method {$method}() cannot be called directly on EnvironmentContext. ".
-                'You must call it inside a forUserAgent() callback: '.
-                "\$env->forUserAgent('*', fn(\$ctx) => \$ctx->{$method}(...))"
+                "Method {$method}() cannot be called directly on EnvironmentContext. " .
+                'You must call it inside a forUserAgent() callback: ' .
+                "\$env->forUserAgent('*', fn(\$ctx) => \$ctx->{$method}(...))",
             );
         }
 
@@ -103,7 +110,7 @@ class EnvironmentContext
         }
 
         throw new BadMethodCallException(
-            "Method {$method} does not exist on ".static::class
+            "Method {$method} does not exist on " . static::class,
         );
     }
 }
