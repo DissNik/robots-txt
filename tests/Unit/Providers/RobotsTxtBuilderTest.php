@@ -2,7 +2,7 @@
 
 namespace DissNik\RobotsTxt\Tests\Unit;
 
-use DissNik\RobotsTxt\RobotsTxtBuilder;
+use DissNik\RobotsTxt\Builders\RobotsTxtBuilder;
 use DissNik\RobotsTxt\Services\ConfigLoader;
 use DissNik\RobotsTxt\Services\ContentGenerator;
 use DissNik\RobotsTxt\Services\DirectiveManager;

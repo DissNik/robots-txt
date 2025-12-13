@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getUserAgents()
  * @method static bool hasUserAgent(string $userAgent)
  *
- * @see \DissNik\RobotsTxt\RobotsTxtBuilder
+ * @see \DissNik\RobotsTxt\Builders\RobotsTxtBuilder
  */
 class RobotsTxt extends Facade
 {

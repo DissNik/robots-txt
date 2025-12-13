@@ -1,6 +1,6 @@
 <?php
 
-namespace DissNik\RobotsTxt;
+namespace DissNik\RobotsTxt\Builders;
 
 use BadMethodCallException;
 use Closure;
@@ -24,11 +24,11 @@ class RobotsTxtBuilder implements RobotsTxtInterface
     private array $globalDirectives = [];
 
     public function __construct(
-        private ConfigLoader $configLoader,
-        private RuleManager $ruleManager,
-        private DirectiveManager $directiveManager,
-        private EnvironmentRuleApplier $environmentApplier,
-        private ContentGenerator $contentGenerator
+        private readonly ConfigLoader $configLoader,
+        private readonly RuleManager $ruleManager,
+        private readonly DirectiveManager $directiveManager,
+        private readonly EnvironmentRuleApplier $environmentApplier,
+        private readonly ContentGenerator $contentGenerator
     ) {
         $this->loadConfig();
     }
@@ -93,7 +93,7 @@ class RobotsTxtBuilder implements RobotsTxtInterface
         $environments = (array) $environments;
 
         $this->environmentApplier->addCallback($environments, function (RobotsTxtInterface $robots) use ($callback): void {
-            $context = new EnvironmentContext($robots, $this->environmentApplier, []);
+            $context = new EnvironmentContext($robots, $this->environmentApplier);
             $callback($context);
         });
 

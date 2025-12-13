@@ -10,7 +10,10 @@ class UserAgentContext
 {
     use Conditionable;
 
-    public function __construct(private RobotsTxtRule $rule, private DirectiveManager $directiveManager) {}
+    public function __construct(private RobotsTxtRule $rule, private DirectiveManager $directiveManager)
+    {
+        //
+    }
 
     public function allow(string $path): self
     {

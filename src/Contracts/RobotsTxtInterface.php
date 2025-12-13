@@ -2,6 +2,12 @@
 
 namespace DissNik\RobotsTxt\Contracts;
 
+use DissNik\RobotsTxt\Builders\RobotsTxtBuilder;
+use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Scoped;
+
+#[Bind(RobotsTxtBuilder::class)]
+#[Scoped]
 interface RobotsTxtInterface
 {
     public function generate(): string;

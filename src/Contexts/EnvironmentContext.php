@@ -11,7 +11,7 @@ class EnvironmentContext
 {
     use Conditionable;
 
-    private array $environments;
+    private array $environments = [];
 
     public function __construct(private RobotsTxtInterface $robotsManager, private EnvironmentRuleApplier $environmentApplier)
     {
