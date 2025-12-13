@@ -14,7 +14,7 @@ use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\warning;
 
-class CheckRobotsTxtConflict extends Command
+final class CheckRobotsTxtConflict extends Command
 {
     protected $signature = 'robots-txt:check
                             {--rename : Automatically rename the file}
@@ -43,12 +43,12 @@ class CheckRobotsTxtConflict extends Command
         return $this->handleInteractiveResolution($filePath);
     }
 
-    protected function fileExists(string $path): bool
+    private function fileExists(string $path): bool
     {
         return file_exists($path) && is_file($path);
     }
 
-    protected function displayConflictWarning(string $path): void
+    private function displayConflictWarning(string $path): void
     {
         error('⚠️  ROBOTS.TXT CONFLICT DETECTED');
 
@@ -67,7 +67,7 @@ class CheckRobotsTxtConflict extends Command
         warning("\nThis file will override package rules! The package robots.txt will not be accessible.");
     }
 
-    protected function processAutoOptions(string $path): bool
+    private function processAutoOptions(string $path): bool
     {
         if ($this->option('rename')) {
             $this->components->info('Renaming robots.txt file...');
@@ -90,7 +90,7 @@ class CheckRobotsTxtConflict extends Command
         return false;
     }
 
-    protected function handleInteractiveResolution(string $path): int
+    private function handleInteractiveResolution(string $path): int
     {
         $choice = select(
             label: 'How would you like to resolve this conflict?',
@@ -112,12 +112,12 @@ class CheckRobotsTxtConflict extends Command
         };
     }
 
-    protected function handleRename(string $path): int
+    private function handleRename(string $path): int
     {
         return $this->renameFile($path) ? self::SUCCESS : self::FAILURE;
     }
 
-    protected function handleDelete(string $path): int
+    private function handleDelete(string $path): int
     {
         if (! $this->option('force') && ! $this->confirmDeletion()) {
             error('Operation cancelled.');
@@ -145,7 +145,7 @@ class CheckRobotsTxtConflict extends Command
         return self::SUCCESS;
     }
 
-    protected function handleView(string $path): int
+    private function handleView(string $path): int
     {
         try {
             $content = File::get($path);
@@ -161,7 +161,7 @@ class CheckRobotsTxtConflict extends Command
         }
     }
 
-    protected function handleIgnore(): int
+    private function handleIgnore(): int
     {
         warning('⚠️  Conflict ignored');
         warning('Package rules will not work while file exists.');
@@ -170,7 +170,7 @@ class CheckRobotsTxtConflict extends Command
         return self::SUCCESS;
     }
 
-    protected function renameFile(string $path): bool
+    private function renameFile(string $path): bool
     {
         $backupPath = $this->generateBackupPath($path);
 
@@ -191,7 +191,7 @@ class CheckRobotsTxtConflict extends Command
         return true;
     }
 
-    protected function deleteFile(string $path): bool
+    private function deleteFile(string $path): bool
     {
         if (! $this->removeFile($path)) {
             return false;
@@ -202,7 +202,7 @@ class CheckRobotsTxtConflict extends Command
         return true;
     }
 
-    protected function generateBackupPath(string $originalPath): string
+    private function generateBackupPath(string $originalPath): string
     {
         $timestamp = date('Y-m-d_His');
         $baseName = basename($originalPath);
@@ -223,7 +223,7 @@ class CheckRobotsTxtConflict extends Command
         return $backupPath;
     }
 
-    protected function createBackup(string $source, string $destination): bool
+    private function createBackup(string $source, string $destination): bool
     {
         try {
             if (! File::copy($source, $destination)) {
@@ -240,7 +240,7 @@ class CheckRobotsTxtConflict extends Command
         }
     }
 
-    protected function removeFile(string $path): bool
+    private function removeFile(string $path): bool
     {
         try {
             if (! File::delete($path)) {
@@ -257,17 +257,17 @@ class CheckRobotsTxtConflict extends Command
         }
     }
 
-    protected function confirmDeletion(string $message = 'Are you sure you want to delete the robots.txt file?'): bool
+    private function confirmDeletion(string $message = 'Are you sure you want to delete the robots.txt file?'): bool
     {
         return confirm(label: $message, default: false);
     }
 
-    protected function confirmBackupCreation(string $message = 'Create a backup before deleting?'): bool
+    private function confirmBackupCreation(string $message = 'Create a backup before deleting?'): bool
     {
         return confirm(label: $message, default: true);
     }
 
-    protected function displaySuccess(string $message, ?string $backupPath = null, ?string $deletedFile = null): void
+    private function displaySuccess(string $message, ?string $backupPath = null, ?string $deletedFile = null): void
     {
         info('✅ '.$message);
 
@@ -283,7 +283,7 @@ class CheckRobotsTxtConflict extends Command
         info("\nThe package robots.txt is now accessible at: ".url('robots.txt'));
     }
 
-    protected function formatBytes(int $bytes, int $precision = 2): string
+    private function formatBytes(int $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);

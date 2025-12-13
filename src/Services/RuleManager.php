@@ -6,7 +6,7 @@ namespace DissNik\RobotsTxt\Services;
 
 use DissNik\RobotsTxt\Rules\RobotsTxtRule;
 
-class RuleManager
+final class RuleManager
 {
     /** @var array<string, RobotsTxtRule> */
     private array $userAgentRules = [];

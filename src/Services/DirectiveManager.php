@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DissNik\RobotsTxt\Services;
 
-class DirectiveManager
+final class DirectiveManager
 {
     private const GLOBAL_SINGLE_DIRECTIVES = ['host'];
 

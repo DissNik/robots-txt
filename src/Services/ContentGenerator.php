@@ -6,9 +6,9 @@ namespace DissNik\RobotsTxt\Services;
 
 use DissNik\RobotsTxt\Rules\RobotsTxtRule;
 
-class ContentGenerator
+final readonly class ContentGenerator
 {
-    public function __construct(private readonly DirectiveManager $directiveManager)
+    public function __construct(private DirectiveManager $directiveManager)
     {
         //
     }
