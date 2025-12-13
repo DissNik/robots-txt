@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Services;
 
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;

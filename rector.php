@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\PHPUnit\CodeQuality\Rector\StmtsAwareInterface\DeclareStrictTypesTestsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -34,6 +36,11 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->parallel();
+
+    $rectorConfig->rules([
+        DeclareStrictTypesRector::class,
+        DeclareStrictTypesTestsRector::class,
+    ]);
 
     $rectorConfig->cacheDirectory(sys_get_temp_dir().'/rector_cache');
 };
