@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Services;
 
 use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
 use Illuminate\Support\Facades\App;
 
-class EnvironmentRuleApplier
+final class EnvironmentRuleApplier
 {
     /** @var array<string, array{environments: array<string>, callback: callable}> */
     private array $environmentCallbacks = [];

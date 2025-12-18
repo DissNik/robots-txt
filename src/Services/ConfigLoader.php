@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Services;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 
-class ConfigLoader
+final class ConfigLoader
 {
     /**
      * @return array{global_directives: array<string, mixed>, user_agent_rules: array<string, mixed>}
@@ -35,7 +37,7 @@ class ConfigLoader
      * @param  array<string, mixed>  $config
      * @return array{global_directives: array<string, mixed>, user_agent_rules: array<string, mixed>}
      */
-    protected function normalizeConfig(array $config): array
+    private function normalizeConfig(array $config): array
     {
         $normalized = [
             'global_directives' => [],

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Contexts;
 
 use DissNik\RobotsTxt\Rules\RobotsTxtRule;
 use DissNik\RobotsTxt\Services\DirectiveManager;
 use Illuminate\Support\Traits\Conditionable;
 
-class UserAgentContext
+final class UserAgentContext
 {
     use Conditionable;
 

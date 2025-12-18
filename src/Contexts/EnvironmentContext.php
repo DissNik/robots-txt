@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Contexts;
 
 use BadMethodCallException;
@@ -7,7 +9,7 @@ use DissNik\RobotsTxt\Contracts\RobotsTxtInterface;
 use DissNik\RobotsTxt\Services\EnvironmentRuleApplier;
 use Illuminate\Support\Traits\Conditionable;
 
-class EnvironmentContext
+final class EnvironmentContext
 {
     use Conditionable;
 
@@ -110,7 +112,7 @@ class EnvironmentContext
         }
 
         throw new BadMethodCallException(
-            "Method {$method} does not exist on " . static::class,
+            "Method {$method} does not exist on " . self::class,
         );
     }
 }

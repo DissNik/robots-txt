@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Http\Controllers;
 
 use DissNik\RobotsTxt\Facades\RobotsTxt;
 use Illuminate\Http\Response;
 
-class RobotsTxtController
+final class RobotsTxtController
 {
     public function __invoke(): Response
     {

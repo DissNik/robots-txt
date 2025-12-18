@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Tests\Unit\Services;
 
 use DissNik\RobotsTxt\Services\ConfigLoader;

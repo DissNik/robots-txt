@@ -45,8 +45,6 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
-        "test-config": "vendor/bin/phpunit --filter=ConfigIntegrationTest",
-        "test-rule": "vendor/bin/phpunit --filter=RobotsTxtRuleTest",
         "analyse": "vendor/bin/phpstan analyse",
         "lint": "vendor/bin/pint --test",
         "lint-fix": "vendor/bin/pint -v",

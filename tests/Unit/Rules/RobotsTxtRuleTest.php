@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DissNik\RobotsTxt\Tests\Unit\Rules;
 
 use DissNik\RobotsTxt\Rules\RobotsTxtRule;
